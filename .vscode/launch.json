@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Launch Vehicle Rental System",
+            "request": "launch",
+            "mainClass": "vheiclerentalsystem.VehicleRentalSystem",
+            "projectName": "Vehicle_Rental_System"
+        }
+    ]
+}
