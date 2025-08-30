@@ -1,11 +1,25 @@
 package vehiclerentalsystem.GUI;
 
-public class VehicleManagement extends javax.swing.JFrame {
+import vehiclerentalsystem.Controllers.VehicleController;
+import vehiclerentalsystem.Models.Vehicle;
+import java.awt.*;
+import java.util.List;
+import javax.swing.*;
+
+public class VehicleManagementForm extends javax.swing.JFrame {
 
     private Class<?> currentFrame;
-    public VehicleManagement() {
+    private VehicleController vehicleController;
+    private JPanel cardsPanel;
+    private JScrollPane cardsScrollPane;
+    private JPanel headerPanel;
+    
+    public VehicleManagementForm() {
+        vehicleController = new VehicleController();
         initComponents();
         currentFrame = this.getClass();
+        setupMainContent();
+        loadVehicles();
     }
 
     /**
@@ -139,7 +153,209 @@ public class VehicleManagement extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void setupMainContent() {
+        // Update the main layout to BorderLayout
+        getContentPane().setLayout(new BorderLayout());
+        
+        // Add sidebar to WEST
+        getContentPane().add(sidebarPanel, BorderLayout.WEST);
+        
+        // Create main content panel
+        JPanel mainContentPanel = new JPanel(new BorderLayout());
+        mainContentPanel.setBackground(new Color(245, 245, 245));
+        
+        // Create header panel with buttons
+        headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 15));
+        headerPanel.setBackground(Color.WHITE);
+        headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        
+        // Create action buttons
+        JButton addButton = createHeaderButton("Add Vehicle", new Color(39, 174, 96));
+        JButton editButton = createHeaderButton("Edit Vehicle", new Color(52, 152, 219));
+        JButton deleteButton = createHeaderButton("Delete Vehicle", new Color(231, 76, 60));
+        JButton refreshButton = createHeaderButton("Refresh", new Color(149, 165, 166));
+        
+        // Add action listeners
+        addButton.addActionListener(e -> openAddVehicleDialog());
+        editButton.addActionListener(e -> openEditVehicleDialog());
+        deleteButton.addActionListener(e -> deleteSelectedVehicle());
+        refreshButton.addActionListener(e -> loadVehicles());
+        
+        headerPanel.add(addButton);
+        headerPanel.add(editButton);
+        headerPanel.add(deleteButton);
+        headerPanel.add(refreshButton);
+        
+        // Create cards panel with FlowLayout
+        cardsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 20));
+        cardsPanel.setBackground(new Color(245, 245, 245));
+        
+        // Create scroll pane for cards
+        cardsScrollPane = new JScrollPane(cardsPanel);
+        cardsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        cardsScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        cardsScrollPane.setBorder(null);
+        
+        // Add components to main content
+        mainContentPanel.add(headerPanel, BorderLayout.NORTH);
+        mainContentPanel.add(cardsScrollPane, BorderLayout.CENTER);
+        
+        // Add main content to frame
+        getContentPane().add(mainContentPanel, BorderLayout.CENTER);
+    }
+    
+    private JButton createHeaderButton(String text, Color backgroundColor) {
+        JButton button = new JButton(text);
+        button.setBackground(backgroundColor);
+        button.setForeground(Color.WHITE);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        button.setPreferredSize(new Dimension(120, 35));
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        return button;
+    }
+    
+    private void loadVehicles() {
+        // Clear existing cards
+        cardsPanel.removeAll();
+        
+        // Load vehicles from controller
+        List<Vehicle> vehicles = vehicleController.loadAllVehicles();
+        
+        if (vehicles.isEmpty()) {
+            JLabel noVehiclesLabel = new JLabel("No vehicles found. Click 'Add Vehicle' to get started.");
+            noVehiclesLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+            noVehiclesLabel.setForeground(Color.GRAY);
+            cardsPanel.add(noVehiclesLabel);
+        } else {
+            // Create card for each vehicle
+            for (Vehicle vehicle : vehicles) {
+                CarCard carCard = new CarCard(vehicle);
+                cardsPanel.add(carCard);
+            }
+        }
+        
+        // Refresh the display
+        cardsPanel.revalidate();
+        cardsPanel.repaint();
+    }
+    
+    private void showAddVehicleDialog() {
+        AddEditVehicleDialog dialog = new AddEditVehicleDialog(this, null, vehicleController);
+        dialog.setVisible(true);
+        
+        // Refresh vehicles after dialog closes
+        loadVehicles();
+    }
+    
+    public void openAddVehicleDialog() {
+        showAddVehicleDialog();
+    }
+    
+    public void openEditVehicleDialog() {
+         CarCard selectedCard = null;
+        for (Component comp : cardsPanel.getComponents()) {
+            if (comp instanceof CarCard) {
+                CarCard card = (CarCard) comp;
+                if (card.isSelected()) {
+                    selectedCard = card;
+                    break;
+                }
+            }
+        }
+        
+        if (selectedCard == null) {
+            JOptionPane.showMessageDialog(this,
+                "Please select a vehicle to edit.",
+                "No Selection",
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        // Confirm deletion
+        int confirm = JOptionPane.showConfirmDialog(this,
+            "Are you sure you want to edit this vehicle?\n" +
+            "Brand: " + selectedCard.getVehicle().getBrand() + "\n" +
+            "Model: " + selectedCard.getVehicle().getModel() + "\n" +
+            "Plate: " + selectedCard.getVehicle().getPlateNb(),
+            "Confirm Edit",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+
+        if(confirm == JOptionPane.YES_OPTION) {
+            try {
+                // edit the vehicle using controller
+                AddEditVehicleDialog dialog= new AddEditVehicleDialog(this, selectedCard.getVehicle(), vehicleController);
+                dialog.setVisible(true);
+                loadVehicles();
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this,
+                    "An error occurred while editing the vehicle: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+    
+    public void deleteSelectedVehicle() {
+        // Find selected vehicle card
+        CarCard selectedCard = null;
+        for (Component comp : cardsPanel.getComponents()) {
+            if (comp instanceof CarCard) {
+                CarCard card = (CarCard) comp;
+                if (card.isSelected()) {
+                    selectedCard = card;
+                    break;
+                }
+            }
+        }
+        
+        if (selectedCard == null) {
+            JOptionPane.showMessageDialog(this,
+                "Please select a vehicle to delete.",
+                "No Selection",
+                JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+        
+        // Confirm deletion
+        int confirm = JOptionPane.showConfirmDialog(this,
+            "Are you sure you want to delete this vehicle?\n" +
+            "Brand: " + selectedCard.getVehicle().getBrand() + "\n" +
+            "Model: " + selectedCard.getVehicle().getModel() + "\n" +
+            "Plate: " + selectedCard.getVehicle().getPlateNb(),
+            "Confirm Deletion",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.WARNING_MESSAGE);
+            
+        if (confirm == JOptionPane.YES_OPTION) {
+            try {
+                // Delete the vehicle using controller
+                boolean deleted = vehicleController.removeVehicle(selectedCard.getVehicle().getId());
+                if (deleted) {
+                    JOptionPane.showMessageDialog(this,
+                        "Vehicle deleted successfully!",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
+                    // Refresh the vehicle list
+                    loadVehicles();
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                        "Failed to delete the vehicle. Please try again.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this,
+                    "An error occurred while deleting the vehicle: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
         // DashBoard Button
         if (currentFrame == AdminDashboard.class){
             return;
@@ -148,22 +364,22 @@ public class VehicleManagement extends javax.swing.JFrame {
         this.dispose();
         AdminDashboard dash = new AdminDashboard();
         dash.setVisible(true);
-    }//GEN-LAST:event_jButton1ActionPerformed
+    }
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // Car management button
-        if (currentFrame == VehicleManagement.class){
+        if (currentFrame == VehicleManagementForm.class){
             return;
         }
         
         this.dispose();
-        VehicleManagement car = new VehicleManagement();
+        VehicleManagementForm car = new VehicleManagementForm();
         car.setVisible(true);
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jButton4ActionPerformed
+    }
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

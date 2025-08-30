@@ -13,7 +13,7 @@ import java.nio.file.StandardCopyOption;
 public class VehicleService {
     private VehicleDAO vehicleDAO;
 
-    private static final String IMAGES_FOLDER = "src/images/vehicles";
+    private static final String IMAGES_FOLDER = "src/images/vehicles/";
 
     public VehicleService() {
         this.vehicleDAO = new VehicleDAO();
@@ -32,7 +32,7 @@ public class VehicleService {
     }
 
     // Business logic validation
-    public boolean addVehicle(Vehicle vehicle, File imageFile) {
+    public boolean addVehicle(Vehicle vehicle) {
         // Validate vehicle data
         if (vehicle.getPlateNb() == null || vehicle.getPlateNb().isEmpty()) {
             throw new IllegalArgumentException("Plate number is required.");

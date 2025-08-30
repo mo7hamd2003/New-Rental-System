@@ -1,5 +1,13 @@
 package vehiclerentalsystem.GUI;
 
+import java.util.List;
+
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import vehiclerentalsystem.Controllers.VehicleController;
+import vehiclerentalsystem.Models.Vehicle;
+import vehiclerentalsystem.GUI.*;
 //import javax.swing.UIManager;
 //import javax.swing.UnsupportedLookAndFeelException;
 //import com.formdev.flatlaf.ui.FlatUIUtils;
@@ -8,7 +16,8 @@ package vehiclerentalsystem.GUI;
 public class AdminDashboard extends javax.swing.JFrame {
 
     private Class<?> currentFrame;
-    
+    private VehicleController vehicleController;
+    private JPanel cardsPanel;
     public AdminDashboard() {
         initComponents();
         currentFrame = this.getClass();
@@ -637,31 +646,43 @@ public class AdminDashboard extends javax.swing.JFrame {
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // Car management button
-        if (currentFrame ==VehicleManagement.class){
+        if (currentFrame ==VehicleManagementForm.class){
             return;
         }
         
         this.dispose();
-        VehicleManagement car = new VehicleManagement();
+        VehicleManagementForm car = new VehicleManagementForm();
         car.setVisible(true);
         
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }
 
-    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton7ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton7ActionPerformed
+    private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {
+        // Navigate to VehicleManagementForm and trigger add vehicle dialog
+        VehicleManagementForm vehicleForm = new VehicleManagementForm();
+        vehicleForm.setVisible(true);
+        // Show add dialog immediately
+        vehicleForm.openAddVehicleDialog();
+        // Close current window
+        this.dispose();
+    }
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton8ActionPerformed
+        VehicleManagementForm vehicleForm = new VehicleManagementForm();
+        vehicleForm.setVisible(true);
+        vehicleForm.openEditVehicleDialog();
+        this.dispose();
+    }
 
     private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton9ActionPerformed
+        VehicleManagementForm vehicleForm = new VehicleManagementForm();
+        vehicleForm.setVisible(true);
+        vehicleForm.deleteSelectedVehicle();
+        this.dispose();
+    }
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
         // TODO add your handling code here:
