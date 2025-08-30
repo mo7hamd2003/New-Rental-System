@@ -243,47 +243,98 @@ public class LoginForm extends javax.swing.JFrame {
         );
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        // Add the authenticator and handlogin logic from vscode,
-        // Also add hashing for password.
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
         
         String username = jTextField1.getText().trim();
         String password = new String(jPasswordField1.getPassword());
         
+        // Input validation
+        if (username.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "Username cannot be empty",
+                "Validation Error",
+                JOptionPane.WARNING_MESSAGE);
+            jTextField1.requestFocus();
+            return;
+        }
+
+        if (password.isEmpty()) {
+            JOptionPane.showMessageDialog(this,
+                "Password cannot be empty",
+                "Validation Error",
+                JOptionPane.WARNING_MESSAGE);
+            jPasswordField1.requestFocus();
+            return;
+        }
+
+        // Clear password field for security
         jPasswordField1.setText("");
         
-        UserService userService = new UserService();
-        UserService.LoginResult result = userService.authenticateUser(username, password);
-        
-        if(result.isSuccess()){
-            JOptionPane.showMessageDialog(this, 
-            "Welcome, " + result.getUser().getFullName() + "!", 
-            "Login Successful", 
-            JOptionPane.INFORMATION_MESSAGE);
-            
-            this.dispose();
-            new AdminDashboard().setVisible(true);
-//            JOptionPane.showMessageDialog(this, "Login Successful! Welcome to AutoEase");
-            // ne MFrame.setVisible(true);
-      
-        } else {
-            JOptionPane.showMessageDialog(this, 
-            result.getMessage(), 
-            "Login Failed", 
-            JOptionPane.ERROR_MESSAGE);
-    }       
-    }//GEN-LAST:event_jButton1ActionPerformed
+        try {
+            UserService userService = new UserService();
+            UserService.LoginResult result = userService.authenticateUser(username, password);
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+            if (result == null) {
+                JOptionPane.showMessageDialog(this,
+                    "Authentication failed. Please check your credentials.",
+                    "Login Failed",
+                    JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Process successful authentication based on role
+            if (result.isSuccess()) {
+                int roleID = result.getUser().getRoleID();
+                String welcomeMessage = String.format("Welcome, %s!", result.getUser().getUsername());
+                
+                switch (roleID) {
+                    case 1: // Admin
+                        JOptionPane.showMessageDialog(this, 
+                            welcomeMessage,
+                            "Login Successful", 
+                            JOptionPane.INFORMATION_MESSAGE);
+                        this.dispose();
+                        new AdminDashboard().setVisible(true);
+                        break;
+                        
+                    case 2: // Employee
+                        JOptionPane.showMessageDialog(this, 
+                            welcomeMessage,
+                            "Login Successful", 
+                            JOptionPane.INFORMATION_MESSAGE);
+                        this.dispose();
+                        new EmployeeDashboard().setVisible(true);
+                        break;
+                        
+                    default:
+                        JOptionPane.showMessageDialog(this,
+                            "Invalid user role",
+                            "Login Failed",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            } else {
+                JOptionPane.showMessageDialog(this,
+                    result.getMessage(),
+                    "Login Failed",
+                    JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this,
+                "An error occurred during login: " + e.getMessage(),
+                "System Error",
+                JOptionPane.ERROR_MESSAGE);
+        }
+}
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
         RegistrationForm RegFrame = new RegistrationForm();
         RegFrame.setVisible(true);
         RegFrame.pack();
         RegFrame.setLocationRelativeTo(null);
         this.dispose();
-    }//GEN-LAST:event_jButton2ActionPerformed
+    }
 
 //    public static void main(String args[]) {
 //        /* Set the Nimbus look and feel */

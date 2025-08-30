@@ -5,7 +5,7 @@
             "type": "java",
             "name": "Launch Vehicle Rental System",
             "request": "launch",
-            "mainClass": "vheiclerentalsystem.VehicleRentalSystem",
+            "mainClass": "vehiclerentalsystem.VehicleRentalSystem",
             "projectName": "Vehicle_Rental_System"
         }
     ]

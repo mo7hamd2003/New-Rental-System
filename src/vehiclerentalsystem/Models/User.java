@@ -157,12 +157,12 @@ public class User{
     
     // Check if user has Admin role.
     public boolean isAdmin(){
-        return roleID == 0;
+        return roleID == 1;
     }
     
     // Check if user has Employee role.
     public boolean isEmployee(){
-        return roleID == 1;
+        return roleID == 2;
     }
 
     @Override

@@ -19,8 +19,10 @@ public class AdminDashboard extends javax.swing.JFrame {
     private VehicleController vehicleController;
     private JPanel cardsPanel;
     public AdminDashboard() {
+        vehicleController = new VehicleController();
         initComponents();
         currentFrame = this.getClass();
+        updateAvailableVehiclesCount();
     }
 
     /**
@@ -81,7 +83,7 @@ public class AdminDashboard extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Car Rental Admin Dashboard");
-        setPreferredSize(new java.awt.Dimension(1000, 700));
+        setPreferredSize(new java.awt.Dimension(1200, 800));
 
         sidebarPanel.setBackground(new java.awt.Color(0, 0, 0));
         sidebarPanel.setPreferredSize(new java.awt.Dimension(250, 100));
@@ -125,6 +127,11 @@ public class AdminDashboard extends javax.swing.JFrame {
         jButton3.setIcon(new javax.swing.ImageIcon("C:\\Users\\mhd\\Downloads\\accountant (1).png")); // NOI18N
         jButton3.setText(" Employee Managment");
         jButton3.setBorderPainted(false);
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         jButton4.setBackground(new java.awt.Color(0, 0, 0));
         jButton4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -631,9 +638,9 @@ public class AdminDashboard extends javax.swing.JFrame {
         getAccessibleContext().setAccessibleDescription("");
 
         pack();
-    }// </editor-fold>//GEN-END:initComponents
+    }
 
-    private void DashboardActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_DashboardActionPerformed
+    private void DashboardActionPerformed(java.awt.event.ActionEvent evt) {
         // DashBoard Button
         if (currentFrame == AdminDashboard.class){
             return;
@@ -642,11 +649,11 @@ public class AdminDashboard extends javax.swing.JFrame {
         this.dispose();
         AdminDashboard dash = new AdminDashboard();
         dash.setVisible(true);
-    }//GEN-LAST:event_DashboardActionPerformed
+    }
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
         // Car management button
-        if (currentFrame ==VehicleManagementForm.class){
+        if (currentFrame == VehicleManagementForm.class){
             return;
         }
         
@@ -656,60 +663,73 @@ public class AdminDashboard extends javax.swing.JFrame {
         
     }
 
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
+        // Employee management button
+        if (currentFrame == EmployeeManagementForm.class){
+            return;
+        }
+        
+        this.dispose();
+        EmployeeManagementForm employee = new EmployeeManagementForm();
+        employee.setVisible(true);
+
+    }
+
     private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {
         // Navigate to VehicleManagementForm and trigger add vehicle dialog
         VehicleManagementForm vehicleForm = new VehicleManagementForm();
         vehicleForm.setVisible(true);
-        // Show add dialog immediately
         vehicleForm.openAddVehicleDialog();
-        // Close current window
         this.dispose();
     }
 
-    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton4ActionPerformed
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {
+ 
+    }
 
-    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
+    private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {
         VehicleManagementForm vehicleForm = new VehicleManagementForm();
         vehicleForm.setVisible(true);
         vehicleForm.openEditVehicleDialog();
         this.dispose();
     }
 
-    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton9ActionPerformed
+    private void jButton9ActionPerformed(java.awt.event.ActionEvent evt) {
         VehicleManagementForm vehicleForm = new VehicleManagementForm();
         vehicleForm.setVisible(true);
         vehicleForm.deleteSelectedVehicle();
         this.dispose();
     }
 
-    private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton10ActionPerformed
+    private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {
+ 
+    }
 
-    private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton11ActionPerformed
+    private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {
+    }
 
-    private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton12ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton12ActionPerformed
+    private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {
 
-    private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton13ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton13ActionPerformed
+    }
 
-    private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton14ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton14ActionPerformed
+    private void jButton13ActionPerformed(java.awt.event.ActionEvent evt) {
 
-    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
-        // LogOut button
+    }
+
+    private void jButton14ActionPerformed(java.awt.event.ActionEvent evt) {
+
+    }
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {
         this.dispose();
         LoginForm login = new LoginForm();
         login.setVisible(true);
-    }//GEN-LAST:event_jButton5ActionPerformed
+    }
+
+    private void updateAvailableVehiclesCount() {
+        int availableVehicles = vehicleController.loadAllVehicles().size();
+        jLabel9.setText(String.valueOf(availableVehicles));
+    }
 
     /**
      * @param args the command line arguments

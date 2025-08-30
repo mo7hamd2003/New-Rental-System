@@ -34,7 +34,7 @@ public class CarCard extends JPanel {
     }
 
     private void initializeComponents() {
-        setPreferredSize(new Dimension(220, 300));
+        setPreferredSize(new Dimension(280, 420));
         setBackground(DEFAULT_COLOR);
         setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(new Color(220, 220, 220), 1),
@@ -44,7 +44,7 @@ public class CarCard extends JPanel {
 
         // Image label
         imageLabel = new JLabel();
-        imageLabel.setPreferredSize(new Dimension(200, 210));
+        imageLabel.setPreferredSize(new Dimension(260, 180));
         imageLabel.setHorizontalAlignment(JLabel.CENTER);
         imageLabel.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200), 1));
 
@@ -192,7 +192,7 @@ public class CarCard extends JPanel {
                 if (imageFile.exists()) {
                     ImageIcon originalIcon = new ImageIcon(imagePath);
                     Image img = originalIcon.getImage();
-                    Image scaledImg = img.getScaledInstance(200, 120, Image.SCALE_SMOOTH);
+                    Image scaledImg = img.getScaledInstance(260, 180, Image.SCALE_SMOOTH);
                     imageLabel.setIcon(new ImageIcon(scaledImg));
                     imageLabel.setText("");
                 } else {
