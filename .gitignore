@@ -1,0 +1,8 @@
+# Ignore compiled output
+bin/
+*.class
+
+# Ignore IDE settings
+.vscode/
+.classpath
+.project

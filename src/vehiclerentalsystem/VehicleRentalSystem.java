@@ -1,6 +1,6 @@
 package vehiclerentalsystem;
 
-// import com.formdev.flatlaf.FlatLightLaf;
+import com.formdev.flatlaf.FlatLightLaf;
 import javax.swing.UIManager;
 import vehiclerentalsystem.GUI.LoginForm;
 import vehiclerentalsystem.DAO.DBConnection;
@@ -17,7 +17,7 @@ public class VehicleRentalSystem {
         
         try {
             // Choose theme
-            // FlatLightLaf.setup();  // light theme
+            FlatLightLaf.setup();  // light theme
             // FlatDarkLaf.setup(); // dark theme
             
             UIManager.put("Button.arc", 20);

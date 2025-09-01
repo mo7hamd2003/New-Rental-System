@@ -4,7 +4,14 @@ import vehiclerentalsystem.Controllers.VehicleController;
 import vehiclerentalsystem.Models.Vehicle;
 import vehiclerentalsystem.Utils.WrapLayout;
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import javax.swing.*;
 
 public class VehicleManagementForm extends javax.swing.JFrame {
@@ -14,6 +21,10 @@ public class VehicleManagementForm extends javax.swing.JFrame {
     private JPanel cardsPanel;
     private JScrollPane cardsScrollPane;
     private JPanel headerPanel;
+    private JComboBox<String> brandFilter;
+    private JComboBox<String> typeFilter;
+    private JSpinner priceFilter;
+    private List<Vehicle> allVehicles; // Store all vehicles for filtering
     
     public VehicleManagementForm() {
         vehicleController = new VehicleController();
@@ -170,12 +181,16 @@ public class VehicleManagementForm extends javax.swing.JFrame {
         JPanel mainContentPanel = new JPanel(new BorderLayout());
         mainContentPanel.setBackground(new Color(245, 245, 245));
         
-        // Create header panel with buttons
-        headerPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 15));
+        // Create header panel with buttons and filters
+        headerPanel = new JPanel(new BorderLayout());
         headerPanel.setBackground(Color.WHITE);
         headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        
-        // Create action buttons
+
+        // Create buttons panel
+        JPanel buttonsPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 15));
+        buttonsPanel.setBackground(Color.WHITE);
+
+        // Create and add action buttons to buttonsPanel
         JButton addButton = createHeaderButton("Add Vehicle", new Color(39, 174, 96));
         JButton editButton = createHeaderButton("Edit Vehicle", new Color(52, 152, 219));
         JButton deleteButton = createHeaderButton("Delete Vehicle", new Color(231, 76, 60));
@@ -187,10 +202,18 @@ public class VehicleManagementForm extends javax.swing.JFrame {
         deleteButton.addActionListener(e -> deleteSelectedVehicle());
         refreshButton.addActionListener(e -> loadVehicles());
         
-        headerPanel.add(addButton);
-        headerPanel.add(editButton);
-        headerPanel.add(deleteButton);
-        headerPanel.add(refreshButton);
+        // Add buttons to panel
+        buttonsPanel.add(addButton);
+        buttonsPanel.add(editButton);
+        buttonsPanel.add(deleteButton);
+        buttonsPanel.add(refreshButton);
+
+        // Create filter panel
+        JPanel filterPanel = createFilterPanel();
+
+        // Add both panels to header
+        headerPanel.add(buttonsPanel, BorderLayout.NORTH);
+        headerPanel.add(filterPanel, BorderLayout.CENTER);
         
         // Create cards panel with WrapLayout for grid-like flow
         cardsPanel = new JPanel(new WrapLayout(FlowLayout.LEFT, 25, 25));
@@ -209,6 +232,153 @@ public class VehicleManagementForm extends javax.swing.JFrame {
         
         // Add main content to frame
         getContentPane().add(mainContentPanel, BorderLayout.CENTER);
+    }
+
+    private JPanel createFilterPanel() {
+        JPanel  filterPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 20, 10));
+        filterPanel.setBackground(Color.WHITE);
+        filterPanel.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+
+        JLabel brandLabel = new JLabel("Brand:");
+        brandFilter = new JComboBox<>();
+        brandFilter.setPreferredSize(new Dimension(150, 25));
+        brandFilter.addItem("All Brands");
+
+        // Type Filter
+        JLabel typeLabel = new JLabel("Type:");
+        typeFilter = new JComboBox<>();
+        typeFilter.setPreferredSize(new Dimension(150, 25));
+        typeFilter.addItem("All Types");
+
+        // Price Filter
+        JLabel priceLabel = new JLabel("Max Daily Rate:");
+        SpinnerNumberModel priceModel = new SpinnerNumberModel(1000, 0, 10000, 50);
+        priceFilter = new JSpinner(priceModel);
+        priceFilter.setPreferredSize(new Dimension(100, 25));
+
+        // Apply Filter Button
+        JButton applyFilter = createHeaderButton("Apply Filters", new Color(52, 152, 219));
+
+        // Add components to panel
+        filterPanel.add(brandLabel);
+        filterPanel.add(brandFilter);
+        filterPanel.add(Box.createHorizontalStrut(10));
+        filterPanel.add(typeLabel);
+        filterPanel.add(typeFilter);
+        filterPanel.add(Box.createHorizontalStrut(10));
+        filterPanel.add(priceLabel);
+        filterPanel.add(priceFilter);
+        filterPanel.add(Box.createHorizontalStrut(20));
+        filterPanel.add(applyFilter);
+
+        // Add action listener to apply filter button
+        applyFilter.addActionListener(e -> applyFilters());
+
+        return filterPanel;
+    }
+
+    private void updateFilterOptions() {
+        // Store selected values
+        String selectedBrand = (String) brandFilter.getSelectedItem();
+        String selectedType = (String) typeFilter.getSelectedItem();
+
+        // Clear existing items
+        brandFilter.removeAllItems();
+        typeFilter.removeAllItems();
+
+        // Add default options
+        brandFilter.addItem("All Brands");
+        typeFilter.addItem("All Types");
+
+        // Create sets to store unique values
+        Set<String> brands = new HashSet<>();
+        Set<String> types = new HashSet<>();
+
+        // Collect unique values
+        for (Vehicle vehicle : allVehicles) {
+            if (vehicle.getBrand() != null) {
+                brands.add(vehicle.getBrand());
+            }
+            if (vehicle.getType() != null) {
+                types.add(vehicle.getType());
+            }
+        }
+
+        // Add sorted items to comboboxes
+        List<String> sortedBrands = new ArrayList<>(brands);
+        List<String> sortedTypes = new ArrayList<>(types);
+        Collections.sort(sortedBrands);
+        Collections.sort(sortedTypes);
+
+        for (String brand : sortedBrands) {
+            brandFilter.addItem(brand);
+        }
+        for (String type : sortedTypes) {
+            typeFilter.addItem(type);
+        }
+
+        // Restore selected values if they exist
+        if (selectedBrand != null) {
+            for (int i = 0; i < brandFilter.getItemCount(); i++) {
+                if (brandFilter.getItemAt(i).equals(selectedBrand)) {
+                    brandFilter.setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
+
+        if (selectedType != null) {
+            for (int i = 0; i < typeFilter.getItemCount(); i++) {
+                if (typeFilter.getItemAt(i).equals(selectedType)) {
+                    typeFilter.setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
+    }
+
+    private void applyFilters() {
+        if (allVehicles == null)
+            return;
+
+        String selectedBrand = (String) brandFilter.getSelectedItem();
+        String selectedType = (String) typeFilter.getSelectedItem();
+        double maxPrice = ((Number) priceFilter.getValue()).doubleValue();
+
+        List<Vehicle> filteredVehicles = new ArrayList<>();
+
+        for (Vehicle vehicle : allVehicles) {
+            boolean brandMatch = selectedBrand.equals("All Brands") ||
+                    (vehicle.getBrand() != null && vehicle.getBrand().equals(selectedBrand));
+            boolean typeMatch = selectedType.equals("All Types") ||
+                    (vehicle.getType() != null && vehicle.getType().equals(selectedType));
+            boolean priceMatch = vehicle.getDailyRate() <= maxPrice;
+
+            if (brandMatch && typeMatch && priceMatch) {
+                filteredVehicles.add(vehicle);
+            }
+        }
+
+        displayFilteredVehicles(filteredVehicles);
+    }
+
+
+    private void displayFilteredVehicles(List<Vehicle> vehicles) {
+        cardsPanel.removeAll();
+
+        if (vehicles.isEmpty()) {
+            JLabel noVehiclesLabel = new JLabel("No vehicles found matching the current filters.");
+            noVehiclesLabel.setFont(new Font("Segoe UI", Font.PLAIN, 16));
+            noVehiclesLabel.setForeground(Color.GRAY);
+            cardsPanel.add(noVehiclesLabel);
+        } else {
+            for (Vehicle vehicle : vehicles) {
+                CarCard carCard = new CarCard(vehicle);
+                cardsPanel.add(carCard);
+            }
+        }
+        cardsPanel.revalidate();
+        cardsPanel.repaint();
     }
     
     private JButton createHeaderButton(String text, Color backgroundColor) {
@@ -229,6 +399,7 @@ public class VehicleManagementForm extends javax.swing.JFrame {
         
         // Load vehicles from controller
         List<Vehicle> vehicles = vehicleController.loadAllVehicles();
+        allVehicles = vehicleController.loadAllVehicles(); // Store all vehicles for filtering
         
         if (vehicles.isEmpty()) {
             JLabel noVehiclesLabel = new JLabel("No vehicles found. Click 'Add Vehicle' to get started.");
@@ -244,7 +415,14 @@ public class VehicleManagementForm extends javax.swing.JFrame {
                 cardsPanel.add(carCard);
             }
         }
+
         
+        // update filter options
+        updateFilterOptions();
+
+        // Apply initial display (no filters)
+        displayFilteredVehicles(allVehicles);
+
         // Refresh the display
         cardsPanel.revalidate();
         cardsPanel.repaint();
