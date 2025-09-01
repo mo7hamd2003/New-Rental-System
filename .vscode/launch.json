@@ -3,6 +3,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CustomerManagementForm",
+            "request": "launch",
+            "mainClass": "vehiclerentalsystem.GUI.CustomerManagementForm",
+            "projectName": "Vehicle_Rental_System"
+        },
+        {
+            "type": "java",
             "name": "Launch Vehicle Rental System",
             "request": "launch",
             "mainClass": "vehiclerentalsystem.VehicleRentalSystem",
