@@ -429,7 +429,7 @@ public class AdminDashboard extends javax.swing.JFrame {
         });
 
         jButton10.setIcon(new javax.swing.ImageIcon("C:\\Users\\mhd\\Downloads\\view-list (1).png")); // NOI18N
-        jButton10.setText("Delete Car");
+        jButton10.setText("List Cars");
         jButton10.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton10ActionPerformed(evt);
@@ -772,10 +772,15 @@ public class AdminDashboard extends javax.swing.JFrame {
     }
 
     private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {
-
+        ListCars listCars = new ListCars();
+        listCars.setVisible(true);
+        // this.dispose();
     }
 
     private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {
+        ListEmployees listEmployees = new ListEmployees();
+        listEmployees.setVisible(true);
+        // this.dispose();
     }
 
     private void jButton12ActionPerformed(java.awt.event.ActionEvent evt) {
