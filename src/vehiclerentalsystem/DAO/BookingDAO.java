@@ -43,7 +43,7 @@ public class BookingDAO {
             stmt.setDate(5, new java.sql.Date(booking.getEndDate().getTime()));
             stmt.setDate(6,
                     booking.getReturnDate() != null ? new java.sql.Date(booking.getReturnDate().getTime()) : null);
-            stmt.setInt(9, booking.getId());
+            stmt.setInt(7, booking.getId());
 
             return stmt.executeUpdate() > 0;
 

@@ -1,7 +1,9 @@
 package vehiclerentalsystem.GUI;
 
 import vehiclerentalsystem.Models.Booking;
+import vehiclerentalsystem.Models.Customer;
 import vehiclerentalsystem.Services.BookingService;
+import vehiclerentalsystem.Services.CustomerService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -14,6 +16,7 @@ public class BookingManagementForm extends JFrame {
     private DefaultTableModel tableModel;
 
     private JTextField txtVehicleId, txtCustomerId, txtUserId, txtStartDate, txtEndDate, txtReturnDate;
+    private JComboBox<Customer> cmbCustomer;
 
     public BookingManagementForm() {
         bookingService = new BookingService();
@@ -35,6 +38,28 @@ public class BookingManagementForm extends JFrame {
                 "RemainderAmount"
         }, 0);
         bookingTable = new JTable(tableModel);
+        bookingTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        bookingTable.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && bookingTable.getSelectedRow() != -1) {
+                int row = bookingTable.getSelectedRow();
+                txtVehicleId.setText(tableModel.getValueAt(row, 1).toString());
+
+                // Set customer combo box based on ID
+                int customerId = (int) tableModel.getValueAt(row, 2);
+                for (int i = 0; i < cmbCustomer.getItemCount(); i++) {
+                    if (cmbCustomer.getItemAt(i).getId() == customerId) {
+                        cmbCustomer.setSelectedIndex(i);
+                        break;
+                    }
+                }
+
+                txtUserId.setText(tableModel.getValueAt(row, 3).toString());
+                txtStartDate.setText(tableModel.getValueAt(row, 4).toString());
+                txtEndDate.setText(tableModel.getValueAt(row, 5).toString());
+                Object returnDate = tableModel.getValueAt(row, 6);
+                txtReturnDate.setText(returnDate != null ? returnDate.toString() : "");
+            }
+        });
         JScrollPane scrollPane = new JScrollPane(bookingTable);
         add(scrollPane, BorderLayout.CENTER);
 
@@ -45,9 +70,12 @@ public class BookingManagementForm extends JFrame {
         txtVehicleId = new JTextField();
         formPanel.add(txtVehicleId);
 
-        formPanel.add(new JLabel("Customer ID:"));
-        txtCustomerId = new JTextField();
-        formPanel.add(txtCustomerId);
+        formPanel.add(new JLabel("Customer:"));
+        // txtCustomerId = new JTextField();
+        // formPanel.add(txtCustomerId);
+        cmbCustomer = new JComboBox<>();
+        formPanel.add(cmbCustomer);
+        loadCustomers(); // Load the combo box items
 
         formPanel.add(new JLabel("User ID:"));
         txtUserId = new JTextField();
@@ -112,9 +140,13 @@ public class BookingManagementForm extends JFrame {
 
     private void addBooking() {
         try {
+            Customer selectedCustomer = (Customer) cmbCustomer.getSelectedItem();
+            int customerId = selectedCustomer.getId();
+
             Booking booking = new Booking(
                     Integer.parseInt(txtVehicleId.getText()),
-                    Integer.parseInt(txtCustomerId.getText()),
+                    // Integer.parseInt(txtCustomerId.getText()),
+                    customerId,
                     Integer.parseInt(txtUserId.getText()),
                     java.sql.Date.valueOf(txtStartDate.getText()),
                     java.sql.Date.valueOf(txtEndDate.getText()),
@@ -141,10 +173,14 @@ public class BookingManagementForm extends JFrame {
         int id = (int) tableModel.getValueAt(selectedRow, 0);
 
         try {
+            Customer selectedCustomer = (Customer) cmbCustomer.getSelectedItem();
+            int customerId = selectedCustomer.getId();
+
             Booking booking = new Booking(
                     id,
                     Integer.parseInt(txtVehicleId.getText()),
-                    Integer.parseInt(txtCustomerId.getText()),
+                    // Integer.parseInt(txtCustomerId.getText()),
+                    customerId,
                     Integer.parseInt(txtUserId.getText()),
                     java.sql.Date.valueOf(txtStartDate.getText()),
                     java.sql.Date.valueOf(txtEndDate.getText()),
@@ -175,6 +211,14 @@ public class BookingManagementForm extends JFrame {
             loadBookings();
         } else {
             JOptionPane.showMessageDialog(this, "Failed to delete booking.");
+        }
+    }
+
+    private void loadCustomers() {
+        cmbCustomer.removeAllItems(); // Clear existing items
+        List<Customer> customers = new CustomerService().getAllCustomers();
+        for (Customer customer : customers) {
+            cmbCustomer.addItem(customer);
         }
     }
 
