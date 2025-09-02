@@ -66,4 +66,10 @@ public class Customer {
     public void setEmail(String email) {
         this.email = email;
     }
+
+    @Override
+    public String toString() {
+        return firstname + " " + lastname; // or any format you prefer
+    }
+
 }
