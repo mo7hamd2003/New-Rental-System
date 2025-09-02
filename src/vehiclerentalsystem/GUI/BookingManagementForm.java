@@ -35,6 +35,19 @@ public class BookingManagementForm extends JFrame {
                 "RemainderAmount"
         }, 0);
         bookingTable = new JTable(tableModel);
+        bookingTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        bookingTable.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && bookingTable.getSelectedRow() != -1) {
+                int row = bookingTable.getSelectedRow();
+                txtVehicleId.setText(tableModel.getValueAt(row, 1).toString());
+                txtCustomerId.setText(tableModel.getValueAt(row, 2).toString());
+                txtUserId.setText(tableModel.getValueAt(row, 3).toString());
+                txtStartDate.setText(tableModel.getValueAt(row, 4).toString());
+                txtEndDate.setText(tableModel.getValueAt(row, 5).toString());
+                Object returnDate = tableModel.getValueAt(row, 6);
+                txtReturnDate.setText(returnDate != null ? returnDate.toString() : "");
+            }
+        });
         JScrollPane scrollPane = new JScrollPane(bookingTable);
         add(scrollPane, BorderLayout.CENTER);
 
