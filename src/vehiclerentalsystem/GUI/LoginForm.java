@@ -296,7 +296,7 @@ public class LoginForm extends javax.swing.JFrame {
                             "Login Successful", 
                             JOptionPane.INFORMATION_MESSAGE);
                         this.dispose();
-                        new AdminDashboard().setVisible(true);
+                        new AdminDashboard(result.getUser()).setVisible(true);
                         break;
                         
                     case 2: // Employee

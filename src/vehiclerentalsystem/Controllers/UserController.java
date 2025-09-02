@@ -26,4 +26,17 @@ public class UserController {
     public boolean deleteEmployee(int userId) {
         return userDAO.deleteEmployee(userId);
     }
+    
+    public boolean updateUserProfile(User user) {
+        return userDAO.AdminProfile(user);
+    }
+    
+    public boolean verifyPassword(String username, String password) {
+        return userDAO.verifyPassword(username, password);
+    }
+    
+    public boolean updatePassword(int userId, String newPassword) {
+        return userDAO.updatePassword(userId, newPassword);
+    }
+
 }
