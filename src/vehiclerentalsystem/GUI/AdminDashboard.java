@@ -4,9 +4,11 @@ import java.util.List;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JOptionPane;
 
 import vehiclerentalsystem.Controllers.VehicleController;
 import vehiclerentalsystem.Models.Vehicle;
+import vehiclerentalsystem.Models.User;
 import vehiclerentalsystem.GUI.*;
 
 //import javax.swing.UIManager;
@@ -19,12 +21,24 @@ public class AdminDashboard extends javax.swing.JFrame {
         private Class<?> currentFrame;
         private VehicleController vehicleController;
         private JPanel cardsPanel;
+        private User currentUser;
 
-        public AdminDashboard() {
-                vehicleController = new VehicleController();
+        public AdminDashboard(User user) {
+                this.currentUser = user;
+                this.vehicleController = new VehicleController();
                 initComponents();
                 currentFrame = this.getClass();
                 updateAvailableVehiclesCount();
+                
+                // Update welcome message with user's name
+                if (user != null) {
+                    jLabel3.setText("Welcome Back, " + user.getFirstName() + "!");
+                }
+        }
+        
+        // Default constructor for compatibility
+        public AdminDashboard() {
+                this(null);
         }
 
         /**
@@ -249,6 +263,11 @@ public class AdminDashboard extends javax.swing.JFrame {
                 jButton6.setBackground(new java.awt.Color(0, 153, 255));
                 jButton6.setForeground(new java.awt.Color(255, 255, 255));
                 jButton6.setText("Profile");
+                jButton6.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                                jButton6ActionPerformed(evt);
+                        }
+                });
 
                 jLabel5.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
                 jLabel5.setIcon(new javax.swing.ImageIcon("C:\\Users\\mhd\\Downloads\\manager (1).png")); // NOI18N
@@ -872,7 +891,7 @@ public class AdminDashboard extends javax.swing.JFrame {
                 }
 
                 this.dispose();
-                AdminDashboard dash = new AdminDashboard();
+                AdminDashboard dash = new AdminDashboard(this.currentUser);
                 dash.setVisible(true);
         }
 
@@ -906,6 +925,22 @@ public class AdminDashboard extends javax.swing.JFrame {
                 vehicleForm.setVisible(true);
                 vehicleForm.openAddVehicleDialog();
                 this.dispose();
+        }
+
+        private void jButton6ActionPerformed(java.awt.event.ActionEvent evt) {
+                if (currentUser == null) {
+                    JOptionPane.showMessageDialog(this,
+                        "Error: User session not found. Please log in again.",
+                        "Session Error",
+                        JOptionPane.ERROR_MESSAGE);
+                    // Redirect to login
+                    this.dispose();
+                    LoginForm login = new LoginForm();
+                    login.setVisible(true);
+                    return;
+                }
+                AdminProfile profile = new AdminProfile(currentUser);
+                profile.setVisible(true);
         }
 
         private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {

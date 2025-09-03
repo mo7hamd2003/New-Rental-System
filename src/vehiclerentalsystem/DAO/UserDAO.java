@@ -3,6 +3,8 @@
 package vehiclerentalsystem.DAO;
 
 import vehiclerentalsystem.Models.User;
+import vehiclerentalsystem.Utils.PasswordUtil;
+
 import java.sql.*;
 import java.util.List;
 import java.util.ArrayList;
@@ -211,18 +213,82 @@ public class UserDAO {
             System.err.println("Error Checking Email existence: " + e.getMessage());
             return true;
         }
+     }
+     
+    /**
+     * Update user profile information
+     * @param user User object with updated information
+     * @return true if successful, false otherwise
+     */
+    public boolean AdminProfile(User user) {
+        String sql = "UPDATE Users SET FirstName = ?, LastName = ?, Email = ? WHERE id = ?";
+        
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            
+            pstmt.setString(1, user.getFirstName());
+            pstmt.setString(2, user.getLastName());
+            pstmt.setString(3, user.getEmail());
+            pstmt.setInt(4, user.getID());
+            
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            System.err.println("Error updating user profile: " + e.getMessage());
+            return false;
+        }
     }
-
-    // Finding User by name and retrieve info about him/her using roleID.
-    public User findUserByUsername(String username) {
-        String sql = """
-                    SELECT u.id, u.Username, u.Email, u.Password, u.FirstName, u.LastName,
-                           u.roleId, r.RoleName, u.IsActive
-                    FROM Users u
-                    INNER JOIN Role r ON u.roleId = r.id
-                    WHERE u.Username = ? AND u.IsActive = 1
-                """;
-
+    
+    /**
+     * Verify user's password
+     * @param username Username of the user
+     * @param password Password to verify
+     * @return true if password matches, false otherwise
+     */
+    public boolean verifyPassword(String username, String password) {
+        User user = findUserByUsername(username);
+        if (user == null) return false;
+        
+        return PasswordUtil.verifyPassword(password, user.getPassword());
+    }
+    
+    /**
+     * Update user's password
+     * @param userId User ID
+     * @param newPassword New password (will be hashed)
+     * @return true if successful, false otherwise
+     */
+    public boolean updatePassword(int userId, String newPassword) {
+        String sql = "UPDATE Users SET Password = ? WHERE id = ?";
+        
+        try {
+            String hashedPassword = PasswordUtil.hashPassword(newPassword);
+            
+            try (Connection conn = DBConnection.getConnection();
+                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+                
+                pstmt.setString(1, hashedPassword);
+                pstmt.setInt(2, userId);
+                
+                int rowsAffected = pstmt.executeUpdate();
+                return rowsAffected > 0;
+            }
+        } catch (Exception e) {
+            System.err.println("Error updating password: " + e.getMessage());
+            return false;
+        }
+    }
+     
+     // Finding User by name and retrieve info about him/her using roleID.
+    public User findUserByUsername(String username){
+         String sql = """
+            SELECT u.id, u.Username, u.Email, u.Password, u.FirstName, u.LastName, 
+                   u.roleId, r.RoleName, u.IsActive
+            FROM Users u
+            INNER JOIN Role r ON u.roleId = r.id
+            WHERE u.Username = ? AND u.IsActive = 1
+        """;
+         
         try (Connection conn = DBConnection.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
