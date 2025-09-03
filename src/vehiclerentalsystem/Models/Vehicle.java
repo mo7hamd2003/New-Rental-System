@@ -13,9 +13,11 @@ public class Vehicle {
     private String description;
     private String imagePath;
 
-    public Vehicle() {}
+    public Vehicle() {
+    }
 
-    public Vehicle(int id, int companyId, String plateNb, String brand, String model, int year, String type, String status, int dailyRate, String description, String imagePath) {
+    public Vehicle(int id, int companyId, String plateNb, String brand, String model, int year, String type,
+            String status, int dailyRate, String description, String imagePath) {
         this.id = id;
         this.companyId = companyId;
         this.plateNb = plateNb;
@@ -30,36 +32,96 @@ public class Vehicle {
 
     }
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+    public int getId() {
+        return id;
+    }
 
-    public int getCompanyId() { return companyId; }
-    public void setCompanyId(int companyId) { this.companyId = companyId; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public String getPlateNb() { return plateNb; }
-    public void setPlateNb(String plateNb) { this.plateNb = plateNb; }
+    public int getCompanyId() {
+        return companyId;
+    }
 
-    public String getBrand() { return brand; }
-    public void setBrand(String brand) { this.brand = brand; }
+    public void setCompanyId(int companyId) {
+        this.companyId = companyId;
+    }
 
-    public String getModel() { return model; }
-    public void setModel(String model) { this.model = model; }
+    public String getPlateNb() {
+        return plateNb;
+    }
 
-    public int getYear() { return year; }
-    public void setYear(int year) { this.year = year; }
+    public void setPlateNb(String plateNb) {
+        this.plateNb = plateNb;
+    }
 
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
+    public String getBrand() {
+        return brand;
+    }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public void setBrand(String brand) {
+        this.brand = brand;
+    }
 
-    public int getDailyRate() { return dailyRate; }
-    public void setDailyRate(int dailyRate) { this.dailyRate = dailyRate; }
+    public String getModel() {
+        return model;
+    }
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+    public void setModel(String model) {
+        this.model = model;
+    }
 
-    public String getImagePath() { return imagePath; }
-    public void setImagePath(String imagePath) { this.imagePath = imagePath; }
+    public int getYear() {
+        return year;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public int getDailyRate() {
+        return dailyRate;
+    }
+
+    public void setDailyRate(int dailyRate) {
+        this.dailyRate = dailyRate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+
+    @Override
+    public String toString() {
+        return brand;
+    }
 }

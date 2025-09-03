@@ -2,8 +2,12 @@ package vehiclerentalsystem.GUI;
 
 import vehiclerentalsystem.Models.Booking;
 import vehiclerentalsystem.Models.Customer;
+import vehiclerentalsystem.Models.User;
+import vehiclerentalsystem.Models.Vehicle;
 import vehiclerentalsystem.Services.BookingService;
 import vehiclerentalsystem.Services.CustomerService;
+import vehiclerentalsystem.Services.UserService;
+import vehiclerentalsystem.Services.VehicleService;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -15,8 +19,10 @@ public class BookingManagementForm extends JFrame {
     private JTable bookingTable;
     private DefaultTableModel tableModel;
 
-    private JTextField txtVehicleId, txtCustomerId, txtUserId, txtStartDate, txtEndDate, txtReturnDate;
+    private JTextField txtStartDate, txtEndDate, txtReturnDate;
     private JComboBox<Customer> cmbCustomer;
+    private JComboBox<User> cmbUser;
+    private JComboBox<Vehicle> cmbVehicle;
 
     public BookingManagementForm() {
         bookingService = new BookingService();
@@ -42,7 +48,15 @@ public class BookingManagementForm extends JFrame {
         bookingTable.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && bookingTable.getSelectedRow() != -1) {
                 int row = bookingTable.getSelectedRow();
-                txtVehicleId.setText(tableModel.getValueAt(row, 1).toString());
+
+                // Set vehicle combo box based on ID
+                int vehicleId = (int) tableModel.getValueAt(row, 1);
+                for (int i = 0; i < cmbVehicle.getItemCount(); i++) {
+                    if (cmbVehicle.getItemAt(i).getId() == vehicleId) {
+                        cmbVehicle.setSelectedIndex(i);
+                        break;
+                    }
+                }
 
                 // Set customer combo box based on ID
                 int customerId = (int) tableModel.getValueAt(row, 2);
@@ -53,7 +67,15 @@ public class BookingManagementForm extends JFrame {
                     }
                 }
 
-                txtUserId.setText(tableModel.getValueAt(row, 3).toString());
+                // Set user combo box based on ID
+                int userId = (int) tableModel.getValueAt(row, 3);
+                for (int i = 0; i < cmbUser.getItemCount(); i++) {
+                    if (cmbUser.getItemAt(i).getID() == userId) {
+                        cmbUser.setSelectedIndex(i);
+                        break;
+                    }
+                }
+
                 txtStartDate.setText(tableModel.getValueAt(row, 4).toString());
                 txtEndDate.setText(tableModel.getValueAt(row, 5).toString());
                 Object returnDate = tableModel.getValueAt(row, 6);
@@ -67,8 +89,11 @@ public class BookingManagementForm extends JFrame {
         JPanel formPanel = new JPanel(new GridLayout(9, 2, 5, 5));
 
         formPanel.add(new JLabel("Vehicle ID:"));
-        txtVehicleId = new JTextField();
-        formPanel.add(txtVehicleId);
+        // txtVehicleId = new JTextField();
+        // formPanel.add(txtVehicleId);
+        cmbVehicle = new JComboBox<>();
+        formPanel.add(cmbVehicle);
+        loadVehicles(); // Load the combo box items
 
         formPanel.add(new JLabel("Customer:"));
         // txtCustomerId = new JTextField();
@@ -78,8 +103,11 @@ public class BookingManagementForm extends JFrame {
         loadCustomers(); // Load the combo box items
 
         formPanel.add(new JLabel("User ID:"));
-        txtUserId = new JTextField();
-        formPanel.add(txtUserId);
+        // txtUserId = new JTextField();
+        // formPanel.add(txtUserId);
+        cmbUser = new JComboBox<>();
+        formPanel.add(cmbUser);
+        loadUsers(); // Load the combo box items
 
         formPanel.add(new JLabel("Start Date (yyyy-mm-dd):"));
         txtStartDate = new JTextField();
@@ -143,11 +171,16 @@ public class BookingManagementForm extends JFrame {
             Customer selectedCustomer = (Customer) cmbCustomer.getSelectedItem();
             int customerId = selectedCustomer.getId();
 
+            User selectedUser = (User) cmbUser.getSelectedItem();
+            int userId = selectedUser.getID();
+
+            Vehicle selectedVehicle = (Vehicle) cmbVehicle.getSelectedItem();
+            int vehicleId = selectedVehicle.getId();
+
             Booking booking = new Booking(
-                    Integer.parseInt(txtVehicleId.getText()),
-                    // Integer.parseInt(txtCustomerId.getText()),
+                    vehicleId,
                     customerId,
-                    Integer.parseInt(txtUserId.getText()),
+                    userId,
                     java.sql.Date.valueOf(txtStartDate.getText()),
                     java.sql.Date.valueOf(txtEndDate.getText()),
                     txtReturnDate.getText().isEmpty() ? null : java.sql.Date.valueOf(txtReturnDate.getText()));
@@ -176,12 +209,17 @@ public class BookingManagementForm extends JFrame {
             Customer selectedCustomer = (Customer) cmbCustomer.getSelectedItem();
             int customerId = selectedCustomer.getId();
 
+            User selectedUser = (User) cmbUser.getSelectedItem();
+            int userId = selectedUser.getID();
+
+            Vehicle selectedVehicle = (Vehicle) cmbVehicle.getSelectedItem();
+            int vehicleId = selectedVehicle.getId();
+
             Booking booking = new Booking(
                     id,
-                    Integer.parseInt(txtVehicleId.getText()),
-                    // Integer.parseInt(txtCustomerId.getText()),
+                    vehicleId,
                     customerId,
-                    Integer.parseInt(txtUserId.getText()),
+                    userId,
                     java.sql.Date.valueOf(txtStartDate.getText()),
                     java.sql.Date.valueOf(txtEndDate.getText()),
                     txtReturnDate.getText().isEmpty() ? null : java.sql.Date.valueOf(txtReturnDate.getText()));
@@ -219,6 +257,22 @@ public class BookingManagementForm extends JFrame {
         List<Customer> customers = new CustomerService().getAllCustomers();
         for (Customer customer : customers) {
             cmbCustomer.addItem(customer);
+        }
+    }
+
+    private void loadUsers() {
+        cmbUser.removeAllItems(); // Clear existing items
+        List<User> users = new UserService().getAllUsers();
+        for (User user : users) {
+            cmbUser.addItem(user);
+        }
+    }
+
+    private void loadVehicles() {
+        cmbVehicle.removeAllItems(); // Clear existing items
+        List<Vehicle> vehicles = new VehicleService().getAllVehicles();
+        for (Vehicle vehicle : vehicles) {
+            cmbVehicle.addItem(vehicle);
         }
     }
 

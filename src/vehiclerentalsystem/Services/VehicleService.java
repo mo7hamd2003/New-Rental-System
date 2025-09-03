@@ -22,7 +22,7 @@ public class VehicleService {
 
     private void createImageFolder() {
         File folder = new File(IMAGES_FOLDER);
-        if (!folder.exists()){
+        if (!folder.exists()) {
             folder.mkdirs();
         }
     }
@@ -40,13 +40,13 @@ public class VehicleService {
         if (vehicle.getDailyRate() <= 0) {
             throw new IllegalArgumentException("Daily rate must be positive.");
         }
-        if (vehicle.getBrand() == null || vehicle.getBrand().trim().isEmpty()){
+        if (vehicle.getBrand() == null || vehicle.getBrand().trim().isEmpty()) {
             throw new IllegalArgumentException("Brand is required.");
         }
-        if(vehicle.getModel() == null || vehicle.getModel().trim().isEmpty()){
+        if (vehicle.getModel() == null || vehicle.getModel().trim().isEmpty()) {
             throw new IllegalArgumentException("Model is required.");
         }
-        if(vehicle.getYear() < 1900 || vehicle.getYear() > 2025){
+        if (vehicle.getYear() < 1900 || vehicle.getYear() > 2025) {
             throw new IllegalArgumentException("Year must be between 1900 and 2025.");
         }
 
@@ -58,7 +58,7 @@ public class VehicleService {
         if (vehicle.getId() <= 0) {
             throw new IllegalArgumentException("Invalid vehicle ID.");
         }
-        if (vehicle.getDailyRate() <= 0){
+        if (vehicle.getDailyRate() <= 0) {
             throw new IllegalArgumentException("Daily rate must be positive.");
         }
 
@@ -94,9 +94,9 @@ public class VehicleService {
         }
     }
 
-    public boolean deleteVehicleImage(String imagePath){
+    public boolean deleteVehicleImage(String imagePath) {
         try {
-            if (imagePath != null && !imagePath.isEmpty()){
+            if (imagePath != null && !imagePath.isEmpty()) {
                 Path path = Paths.get(imagePath);
                 return Files.deleteIfExists(path);
             }
@@ -107,13 +107,13 @@ public class VehicleService {
     }
 
     public boolean isImageExists(String imagePath) {
-        if (imagePath == null || imagePath.isEmpty()){
+        if (imagePath == null || imagePath.isEmpty()) {
             return false;
         }
         return Files.exists(Paths.get(imagePath));
     }
 
-    // Business logic for vehicle availability 
+    // Business logic for vehicle availability
     public boolean isVehicleAvailable(int vehicleId) {
         Vehicle vehicle = vehicleDAO.getVehicleById(vehicleId);
         return vehicle != null && "available".equalsIgnoreCase(vehicle.getStatus());
@@ -121,7 +121,7 @@ public class VehicleService {
 
     public List<Vehicle> getAvailableVehicles() {
         return getAllVehicles().stream()
-            .filter(v -> "available".equalsIgnoreCase(v.getStatus()))
-            .collect(java.util.stream.Collectors.toList());
+                .filter(v -> "available".equalsIgnoreCase(v.getStatus()))
+                .collect(java.util.stream.Collectors.toList());
     }
 }

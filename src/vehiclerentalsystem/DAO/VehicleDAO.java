@@ -6,33 +6,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class VehicleDAO {
-    
-    public List<Vehicle> getAllVehicles(){
+
+    public List<Vehicle> getAllVehicles() {
         List<Vehicle> vehicles = new ArrayList<>();
         String sql = "SELECT * FROM vehicle";
 
         try (Connection conn = DBConnection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)){
-                    
-                    ResultSet rs = pstmt.executeQuery();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-                    while(rs.next()){
-                        Vehicle vehicle = new Vehicle(
-                            rs.getInt("id"),
-                            rs.getInt("companyId"),
-                            rs.getString("PlateNb"),
-                            rs.getString("Brand"),
-                            rs.getString("Model"),
-                            rs.getInt("year"),
-                            rs.getString("Type"),
-                            rs.getString("status"),
-                            rs.getInt("DailyRate"),
-                            rs.getString("Description"),
-                            rs.getString("imagePath")
-                        );
-                        vehicles.add(vehicle);
-                    }
+            ResultSet rs = pstmt.executeQuery();
 
+            while (rs.next()) {
+                Vehicle vehicle = new Vehicle(
+                        rs.getInt("id"),
+                        rs.getInt("companyId"),
+                        rs.getString("PlateNb"),
+                        rs.getString("Brand"),
+                        rs.getString("Model"),
+                        rs.getInt("year"),
+                        rs.getString("Type"),
+                        rs.getString("status"),
+                        rs.getInt("DailyRate"),
+                        rs.getString("Description"),
+                        rs.getString("imagePath"));
+                vehicles.add(vehicle);
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -41,23 +39,23 @@ public class VehicleDAO {
         return vehicles;
     }
 
-    public boolean insertVehicle(Vehicle vehicle){
+    public boolean insertVehicle(Vehicle vehicle) {
         String sql = "INSERT INTO Vehicle (companyId, PlateNb, Brand, Model, year, Type, status, DailyRate, Description, imagePath) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBConnection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)){
-                
-                pstmt.setInt(1, vehicle.getCompanyId());
-                pstmt.setString(2, vehicle.getPlateNb());
-                pstmt.setString(3, vehicle.getBrand());
-                pstmt.setString(4, vehicle.getModel());
-                pstmt.setInt(5, vehicle.getYear());
-                pstmt.setString(6, vehicle.getType());
-                pstmt.setString(7, vehicle.getStatus());
-                pstmt.setInt(8, vehicle.getDailyRate());
-                pstmt.setString(9, vehicle.getDescription());
-                pstmt.setString(10, vehicle.getImagePath());
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-                return pstmt.executeUpdate() > 0;
+            pstmt.setInt(1, vehicle.getCompanyId());
+            pstmt.setString(2, vehicle.getPlateNb());
+            pstmt.setString(3, vehicle.getBrand());
+            pstmt.setString(4, vehicle.getModel());
+            pstmt.setInt(5, vehicle.getYear());
+            pstmt.setString(6, vehicle.getType());
+            pstmt.setString(7, vehicle.getStatus());
+            pstmt.setInt(8, vehicle.getDailyRate());
+            pstmt.setString(9, vehicle.getDescription());
+            pstmt.setString(10, vehicle.getImagePath());
+
+            return pstmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -65,25 +63,25 @@ public class VehicleDAO {
         }
     }
 
-    public boolean updateVehicle(Vehicle vehicle){
+    public boolean updateVehicle(Vehicle vehicle) {
         String sql = "UPDATE Vehicle SET companyId = ?, PlateNb = ?, Brand = ?, Model = ?, year = ?, Type = ?, status = ?, DailyRate = ?, Description = ?, imagePath = ? WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)){
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-                    pstmt.setInt(1, vehicle.getCompanyId());
-                    pstmt.setString(2, vehicle.getPlateNb());
-                    pstmt.setString(3, vehicle.getBrand());
-                    pstmt.setString(4, vehicle.getModel());
-                    pstmt.setInt(5, vehicle.getYear());
-                    pstmt.setString(6, vehicle.getType());
-                    pstmt.setString(7, vehicle.getStatus());
-                    pstmt.setInt(8, vehicle.getDailyRate());
-                    pstmt.setString(9, vehicle.getDescription());
-                    pstmt.setString(10, vehicle.getImagePath());
-                    pstmt.setInt(11, vehicle.getId());
+            pstmt.setInt(1, vehicle.getCompanyId());
+            pstmt.setString(2, vehicle.getPlateNb());
+            pstmt.setString(3, vehicle.getBrand());
+            pstmt.setString(4, vehicle.getModel());
+            pstmt.setInt(5, vehicle.getYear());
+            pstmt.setString(6, vehicle.getType());
+            pstmt.setString(7, vehicle.getStatus());
+            pstmt.setInt(8, vehicle.getDailyRate());
+            pstmt.setString(9, vehicle.getDescription());
+            pstmt.setString(10, vehicle.getImagePath());
+            pstmt.setInt(11, vehicle.getId());
 
-                    return pstmt.executeUpdate() > 0;
+            return pstmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -91,14 +89,14 @@ public class VehicleDAO {
         }
     }
 
-    public boolean deleteVehicle(int vehicleId){
+    public boolean deleteVehicle(int vehicleId) {
         String sql = "DELETE FROM Vehicle WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)){
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
-                    pstmt.setInt(1, vehicleId);
-                    return pstmt.executeUpdate() > 0;
+            pstmt.setInt(1, vehicleId);
+            return pstmt.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -106,11 +104,11 @@ public class VehicleDAO {
         }
     }
 
-    public Vehicle getVehicleById(int id){
+    public Vehicle getVehicleById(int id) {
         String sql = "SELECT * FROM Vehicle WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection();
-                PreparedStatement pstmt = conn.prepareStatement(sql)){
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setInt(1, id);
             ResultSet rs = pstmt.executeQuery();
@@ -127,11 +125,10 @@ public class VehicleDAO {
                         rs.getString("status"),
                         rs.getInt("DailyRate"),
                         rs.getString("Description"),
-                        rs.getString("imagePath")
-                );
+                        rs.getString("imagePath"));
             }
 
-        } catch(SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
