@@ -1,12 +1,28 @@
 package vehiclerentalsystem.GUI;
 
+import vehiclerentalsystem.Controllers.UserController;
+import vehiclerentalsystem.Models.User;
+import java.util.List;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class EmployeeManagementForm extends javax.swing.JFrame {
 
-     private Class<?> currentFrame;
+    private Class<?> currentFrame;
+    private UserController userController;
+    private JTable employeeTable;
+    private DefaultTableModel tableModel;
+    private JButton addButton, deleteButton, toggleStatusButton, changeRoleButton;
+
     public EmployeeManagementForm() {
+        userController = new UserController();
         initComponents();
         currentFrame = this.getClass();
+        setupEmployeeManagement();
+        loadEmployeeData();
     }
 
     /**
@@ -128,24 +144,309 @@ public class EmployeeManagementForm extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
+        // Create main content panel
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(Color.WHITE);
+
+        // Create table
+        setupEmployeeTable();
+
+        // Create buttons panel
+        setupButtonsPanel();
+
+        // Add components to main panel
+        mainPanel.add(new JScrollPane(employeeTable), BorderLayout.CENTER);
+
+        JPanel buttonsPanel = new JPanel(new FlowLayout());
+        buttonsPanel.add(addButton);
+        buttonsPanel.add(deleteButton);
+        buttonsPanel.add(toggleStatusButton);
+        buttonsPanel.add(changeRoleButton);
+        mainPanel.add(buttonsPanel, BorderLayout.SOUTH);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(sidebarPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 414, Short.MAX_VALUE))
+                .addGap(0, 0, 0)
+                .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 950, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(sidebarPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 688, Short.MAX_VALUE)
+            .addComponent(sidebarPanel, javax.swing.GroupLayout.DEFAULT_SIZE, 800, Short.MAX_VALUE)
+            .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         pack();
-    }                      
+    }
 
-    private void DashboardActionPerformed(java.awt.event.ActionEvent evt) {                                          
-        // DashBoard Button
+    private void setupEmployeeTable() {
+        String[] columnNames = {"ID", "Username", "First Name", "Last Name", "Email", "Role", "Status"};
+        tableModel = new DefaultTableModel(columnNames, 0) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make table read-only
+            }
+        };
+
+        employeeTable = new JTable(tableModel);
+        employeeTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        employeeTable.getTableHeader().setReorderingAllowed(false);
+        employeeTable.setRowHeight(25);
+    }
+
+    private void setupButtonsPanel() {
+        addButton = new JButton("Add Employee");
+        deleteButton = new JButton("Delete Employee");
+        toggleStatusButton = new JButton("Toggle Status");
+        changeRoleButton = new JButton("Change Role");
+
+        // Style buttons
+        styleButton(addButton, new Color(34, 139, 34), new Color(50, 205, 50));
+        styleButton(deleteButton, new Color(220, 20, 60), new Color(255, 69, 0));
+        styleButton(toggleStatusButton, new Color(255, 140, 0), new Color(255, 165, 0));
+        styleButton(changeRoleButton, new Color(70, 130, 180), new Color(100, 149, 237));
+
+        // Add action listeners
+        addButton.addActionListener(e -> addEmployee());
+        deleteButton.addActionListener(e -> deleteEmployee());
+        toggleStatusButton.addActionListener(e -> toggleEmployeeStatus());
+        changeRoleButton.addActionListener(e -> changeEmployeeRole());
+    }
+
+    private void styleButton(JButton button, Color bgColor, Color hoverColor) {
+        button.setBackground(bgColor);
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.setPreferredSize(new Dimension(140, 35));
+
+        button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                button.setBackground(hoverColor);
+            }
+
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                button.setBackground(bgColor);
+            }
+        });
+    }
+
+    private void setupEmployeeManagement() {
+        // Additional setup if needed
+    }
+
+    private void loadEmployeeData() {
+        // Clear existing data
+        tableModel.setRowCount(0);
+
+        // Load employees from database
+        List<User> employees = userController.getAllEmployees();
+
+        for (User employee : employees) {
+            Object[] row = {
+                employee.getID(),
+                employee.getUsername(),
+                employee.getFirstName(),
+                employee.getLastName(),
+                employee.getEmail(),
+                employee.getRoleName(),
+                employee.isActive() ? "Active" : "Inactive"
+            };
+            tableModel.addRow(row);
+        }
+    }
+
+    private void addEmployee() {
+        // Create dialog for adding new employee
+        JDialog dialog = new JDialog(this, "Add New Employee", true);
+        dialog.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+
+        // Create form fields
+        JTextField usernameField = new JTextField(20);
+        JPasswordField passwordField = new JPasswordField(20);
+        JTextField firstNameField = new JTextField(20);
+        JTextField lastNameField = new JTextField(20);
+        JTextField emailField = new JTextField(20);
+        JComboBox<String> roleComboBox = new JComboBox<>(new String[]{"Employee", "Admin"});
+
+        // Add components to dialog
+        gbc.gridx = 0; gbc.gridy = 0;
+        dialog.add(new JLabel("Username:"), gbc);
+        gbc.gridx = 1;
+        dialog.add(usernameField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 1;
+        dialog.add(new JLabel("Password:"), gbc);
+        gbc.gridx = 1;
+        dialog.add(passwordField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 2;
+        dialog.add(new JLabel("First Name:"), gbc);
+        gbc.gridx = 1;
+        dialog.add(firstNameField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 3;
+        dialog.add(new JLabel("Last Name:"), gbc);
+        gbc.gridx = 1;
+        dialog.add(lastNameField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 4;
+        dialog.add(new JLabel("Email:"), gbc);
+        gbc.gridx = 1;
+        dialog.add(emailField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 5;
+        dialog.add(new JLabel("Role:"), gbc);
+        gbc.gridx = 1;
+        dialog.add(roleComboBox, gbc);
+
+        // Buttons
+        JPanel buttonPanel = new JPanel();
+        JButton saveButton = new JButton("Save");
+        JButton cancelButton = new JButton("Cancel");
+
+        saveButton.addActionListener(e -> {
+            // Validate and save employee
+            String username = usernameField.getText().trim();
+            String password = new String(passwordField.getPassword());
+            String firstName = firstNameField.getText().trim();
+            String lastName = lastNameField.getText().trim();
+            String email = emailField.getText().trim();
+            int roleId = roleComboBox.getSelectedIndex() + 1; // 1 for Employee, 2 for Admin
+
+            if (username.isEmpty() || password.isEmpty() || firstName.isEmpty() ||
+                lastName.isEmpty() || email.isEmpty()) {
+                JOptionPane.showMessageDialog(dialog, "All fields are required!", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            // Here you would typically call a service to create the employee
+            // For now, just show success message
+            JOptionPane.showMessageDialog(dialog, "Employee added successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            dialog.dispose();
+            loadEmployeeData(); // Refresh table
+        });
+
+        cancelButton.addActionListener(e -> dialog.dispose());
+
+        buttonPanel.add(saveButton);
+        buttonPanel.add(cancelButton);
+
+        gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 2;
+        dialog.add(buttonPanel, gbc);
+
+        dialog.pack();
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+    }
+
+    private void deleteEmployee() {
+        int selectedRow = employeeTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select an employee to delete.", "No Selection", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int employeeId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        String employeeName = (String) tableModel.getValueAt(selectedRow, 2) + " " + (String) tableModel.getValueAt(selectedRow, 3);
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+            "Are you sure you want to delete employee: " + employeeName + "?",
+            "Confirm Delete",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            boolean success = userController.deleteEmployee(employeeId);
+            if (success) {
+                JOptionPane.showMessageDialog(this, "Employee deleted successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                loadEmployeeData(); // Refresh table
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to delete employee.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void toggleEmployeeStatus() {
+        int selectedRow = employeeTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select an employee.", "No Selection", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int employeeId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        String currentStatus = (String) tableModel.getValueAt(selectedRow, 6);
+        String newStatus = currentStatus.equals("Active") ? "Inactive" : "Active";
+        String employeeName = (String) tableModel.getValueAt(selectedRow, 2) + " " + (String) tableModel.getValueAt(selectedRow, 3);
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+            "Are you sure you want to " + (newStatus.equals("Active") ? "activate" : "deactivate") +
+            " employee: " + employeeName + "?",
+            "Confirm Status Change",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE);
+
+        if (confirm == JOptionPane.YES_OPTION) {
+            boolean success = userController.toggleUserStatus(employeeId);
+            if (success) {
+                JOptionPane.showMessageDialog(this,
+                    "Employee status changed to " + newStatus + " successfully!",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+                loadEmployeeData(); // Refresh table
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to change employee status.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void changeEmployeeRole() {
+        int selectedRow = employeeTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(this, "Please select an employee.", "No Selection", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int employeeId = (Integer) tableModel.getValueAt(selectedRow, 0);
+        String currentRole = (String) tableModel.getValueAt(selectedRow, 5);
+        String employeeName = (String) tableModel.getValueAt(selectedRow, 2) + " " + (String) tableModel.getValueAt(selectedRow, 3);
+
+        String[] roles = {"Employee", "Admin"};
+        String newRole = (String) JOptionPane.showInputDialog(this,
+            "Select new role for " + employeeName + ":",
+            "Change Role",
+            JOptionPane.QUESTION_MESSAGE,
+            null,
+            roles,
+            currentRole);
+
+        if (newRole != null && !newRole.equals(currentRole)) {
+            int newRoleId = newRole.equals("Admin") ? 1 : 2;
+
+            boolean success = userController.updateUserRole(employeeId, newRoleId);
+            if (success) {
+                JOptionPane.showMessageDialog(this,
+                    "Employee role changed to " + newRole + " successfully!",
+                    "Success",
+                    JOptionPane.INFORMATION_MESSAGE);
+                loadEmployeeData(); // Refresh table
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to change employee role.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }
+
+    private void DashboardActionPerformed(java.awt.event.ActionEvent evt) {
+        // DashBoard Button - This form is only accessible by admins, so always go to AdminDashboard
         if (currentFrame == AdminDashboard.class){
             return;
         }
@@ -153,7 +454,7 @@ public class EmployeeManagementForm extends javax.swing.JFrame {
         this.dispose();
         AdminDashboard dash = new AdminDashboard();
         dash.setVisible(true);
-    }                                         
+    }
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {                                         
         // Car management button

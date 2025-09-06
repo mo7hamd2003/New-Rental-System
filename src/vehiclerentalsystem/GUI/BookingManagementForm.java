@@ -18,6 +18,7 @@ public class BookingManagementForm extends JFrame {
     private BookingService bookingService;
     private JTable bookingTable;
     private DefaultTableModel tableModel;
+    private User currentUser;
 
     private JTextField txtStartDate, txtEndDate, txtReturnDate;
     private JComboBox<Customer> cmbCustomer;
@@ -25,6 +26,11 @@ public class BookingManagementForm extends JFrame {
     private JComboBox<Vehicle> cmbVehicle;
 
     public BookingManagementForm() {
+        this(null);
+    }
+
+    public BookingManagementForm(User currentUser) {
+        this.currentUser = currentUser;
         bookingService = new BookingService();
         setTitle("Booking Management");
         setSize(1000, 600);
@@ -144,7 +150,11 @@ public class BookingManagementForm extends JFrame {
         btnDelete.addActionListener(e -> deleteBooking());
         btnBack.addActionListener(e -> {
             dispose();
-            new AdminDashboard().setVisible(true);
+            if (currentUser != null && currentUser.isEmployee()) {
+                new EmployeeDashboard(currentUser).setVisible(true);
+            } else {
+                new AdminDashboard().setVisible(true);
+            }
         });
     }
 

@@ -4,498 +4,315 @@ import vehiclerentalsystem.Models.User;
 import vehiclerentalsystem.Controllers.UserController;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import javax.imageio.ImageIO;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import vehiclerentalsystem.Utils.UIUtil;
 
-public class AdminProfile extends javax.swing.JFrame {
+public class AdminProfile extends JFrame {
     private User currentUser;
-    private final UserController userController;
+    private UserController userController;
+    private JLabel avatarLabel;
+    private JLabel nameLabel;
+    private JLabel emailLabel;
+    private JTextField nameField;
+    private JTextField emailField;
+    private JButton saveButton;
+    private JButton changePasswordButton;
+    private JButton changeAvatarButton;
 
     public AdminProfile(User user) {
         if (user == null) {
             throw new IllegalArgumentException("User cannot be null");
         }
-        
+
         this.currentUser = user;
         this.userController = new UserController();
-        
-        // Initialize components first
-        initComponents();
-        setupUI();
+
+        initializeComponents();
+        setupLayout();
+        setupStyling();
         loadUserData();
+
+        setTitle("Admin Profile");
+        setSize(500, 600);
+        setLocationRelativeTo(null);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setVisible(true);
     }
-    
-    private void setupUI() {
-        getContentPane().setBackground(Color.BLACK);
-        
-        // Setup circular avatar
-        setupCircularAvatar();
-        
-        // jPanel1.setOpaque(false);
-        // jPanel1.setBorder(new EmptyBorder(10, 10, 10, 10));
-        
+
+    private void initializeComponents() {
+        avatarLabel = new JLabel();
+        avatarLabel.setPreferredSize(new Dimension(120, 120));
+        avatarLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        avatarLabel.setBorder(BorderFactory.createLineBorder(Color.GRAY, 2));
+
+        nameLabel = new JLabel("Username:");
+        emailLabel = new JLabel("Email:");
+
+        nameField = new JTextField(20);
+        emailField = new JTextField(20);
+
+        saveButton = new JButton("Save Changes");
+        changePasswordButton = new JButton("Change Password");
+        changeAvatarButton = new JButton("Change Avatar");
+
+        saveButton.addActionListener(this::saveChanges);
+        changePasswordButton.addActionListener(this::changePassword);
+        changeAvatarButton.addActionListener(this::changeAvatar);
+    }
+
+    private void setupLayout() {
+        setLayout(new BorderLayout(10, 10));
+        ((JPanel) getContentPane()).setBorder(new EmptyBorder(20, 20, 20, 20));
+
+        // Header panel with avatar
+        JPanel headerPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        headerPanel.add(avatarLabel);
+        headerPanel.add(changeAvatarButton);
+
+        // Info panel
+        JPanel infoPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.WEST;
+
+        gbc.gridx = 0; gbc.gridy = 0;
+        infoPanel.add(nameLabel, gbc);
+        gbc.gridx = 1;
+        infoPanel.add(nameField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 1;
+        infoPanel.add(emailLabel, gbc);
+        gbc.gridx = 1;
+        infoPanel.add(emailField, gbc);
+
+        // Button panel
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 10));
+        buttonPanel.add(saveButton);
+        buttonPanel.add(changePasswordButton);
+
+        add(headerPanel, BorderLayout.NORTH);
+        add(infoPanel, BorderLayout.CENTER);
+        add(buttonPanel, BorderLayout.SOUTH);
+    }
+
+    private void setupStyling() {
+        // Modern color scheme
+        Color primaryColor = new Color(52, 152, 219);
+        Color secondaryColor = new Color(46, 204, 113);
+        Color backgroundColor = new Color(248, 249, 250);
+        Color textColor = new Color(44, 62, 80);
+
+        getContentPane().setBackground(backgroundColor);
+
+        // Apply FlatLaf rounded styling using UIUtil
+        UIUtil.styleFrame(this);
+
         // Style labels
-        jLabel2.setForeground(Color.WHITE);
-        jLabel3.setForeground(Color.WHITE);
-        jLabel4.setForeground(Color.WHITE);
-        jLabel5.setForeground(Color.WHITE);
+        Font labelFont = new Font("Segoe UI", Font.BOLD, 14);
+        nameLabel.setFont(labelFont);
+        emailLabel.setFont(labelFont);
+        nameLabel.setForeground(textColor);
+        emailLabel.setForeground(textColor);
+
+        // Style text fields with UIUtil
+        UIUtil.styleTextField(nameField);
+        UIUtil.styleTextField(emailField);
 
         // Style buttons
-        styleButton(jButton2, new Color(0, 180, 0), new Color(0, 150, 0)); // Green for Save Changes
-        styleButton(jButton1, new Color(0, 120, 215), new Color(0, 100, 190)); // Blue for Change Password
-        
-        // Style text fields
-        styleTextField(jTextField1);
-        styleTextField(jTextField2);
+        UIUtil.styleButton(saveButton, primaryColor);
+        UIUtil.styleButton(changePasswordButton, secondaryColor);
+        UIUtil.styleButton(changeAvatarButton, new Color(155, 89, 182));
 
-        styleButton(jButton2, new Color(0, 180, 0), new Color(0, 150, 0));
-        
+        // Avatar styling
+        avatarLabel.setOpaque(true);
+        avatarLabel.setBackground(Color.WHITE);
+        UIUtil.makeRounded(avatarLabel, UIUtil.RADIUS_LARGE);
+    }
 
-        styleButton(jButton1, new Color(0, 120, 215), new Color(0, 100, 190));
-        
-        // Style text fields
-        // styleTextField(jTextField1);
-        // styleTextField(jTextField2);
-        
-        // Set window properties
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setLocationRelativeTo(null);
-        setTitle("Admin Profile");
-        
-        ((JPanel)getContentPane()).setBorder(new EmptyBorder(20, 20, 20, 20));
-    }
-    
-    private void styleButton(JButton button, Color baseColor, Color hoverColor) {
-        button.setBackground(baseColor);
-        button.setForeground(Color.WHITE);
-        button.setFocusPainted(false);
-        button.setBorderPainted(false);
-        button.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        
-        // Add hover effect
-        button.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseEntered(java.awt.event.MouseEvent evt) {
-                button.setBackground(hoverColor);
-            }
-            
-            @Override
-            public void mouseExited(java.awt.event.MouseEvent evt) {
-                button.setBackground(baseColor);
-            }
-        });
-}
-    
-    private void styleTextField(JTextField textField) {
-        textField.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(200, 200, 200)), 
-            BorderFactory.createEmptyBorder(8, 10, 8, 10)));
-        textField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        textField.setBackground(new Color(250, 250, 250));
-        textField.setForeground(Color.BLACK);
-        textField.setCaretColor(Color.BLACK);
-        
-        // Add focus effect and placeholder behavior
-        textField.addFocusListener(new java.awt.event.FocusAdapter() {
-            @Override
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                textField.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(52, 152, 219)), 
-                    BorderFactory.createEmptyBorder(8, 10, 8, 10)));
-                
-                if (textField.getText().equals("Enter your name") || 
-                    textField.getText().equals("Enter your email")) {
-                    textField.setText("");
-                    textField.setForeground(Color.BLACK);
-                }
-            }
-            
-            @Override
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                textField.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createLineBorder(new Color(200, 200, 200)), 
-                    BorderFactory.createEmptyBorder(8, 10, 8, 10)));
-                
-                if (textField.getText().isEmpty()) {
-                    if (textField == jTextField1) {
-                        textField.setText("Enter your name");
-                    } else if (textField == jTextField2) {
-                        textField.setText("Enter your email");
-                    }
-                    textField.setForeground(Color.GRAY);
-                }
-            }
-        });
-    }
-    
-    private void setupCircularAvatar() {
-        // Create a circular panel for the avatar
-        JPanel avatarPanel = new JPanel() {
-            @Override
-            protected void paintComponent(Graphics g) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
-                int diameter = Math.min(getWidth(), getHeight());
-                int x = (getWidth() - diameter) / 2;
-                int y = (getHeight() - diameter) / 2;
-                
-                // Draw circle background
-                g2.setColor(new Color(52, 152, 219));
-                g2.fillOval(x, y, diameter, diameter);
-                
-                // Draw user's initial
-                if (currentUser != null && currentUser.getFirstName() != null) {
-                    String initial = currentUser.getFirstName().substring(0, 1).toUpperCase();
-                    g2.setColor(Color.WHITE);
-                    g2.setFont(new Font("Segoe UI", Font.BOLD, 36));
-                    
-                    FontMetrics fm = g2.getFontMetrics();
-                    int textX = x + (diameter - fm.stringWidth(initial)) / 2;
-                    int textY = y + ((diameter - fm.getHeight()) / 2) + fm.getAscent();
-                    
-                    g2.drawString(initial, textX, textY);
-                }
-                
-                g2.dispose();
-            }
-            
-            @Override
-            public Dimension getPreferredSize() {
-                return new Dimension(80, 80);
-            }
-        };
-        
-        avatarPanel.setOpaque(false);
-        jLabel1.setText("");
-        jLabel1.setLayout(new BorderLayout());
-        jLabel1.add(avatarPanel, BorderLayout.CENTER);
-    }
-    
+
     private void loadUserData() {
         if (currentUser != null) {
-            String firstName = currentUser.getFirstName();
-            String lastName = currentUser.getLastName();
-            String fullName = (firstName != null ? firstName : "") + 
-                            ((lastName != null && !lastName.isEmpty()) ? " " + lastName : "");
-            String email = currentUser.getEmail();
-            
-            // Set default values if data is missing
-            if (fullName.trim().isEmpty()) {
-                fullName = "Admin User";
-            }
-            if (email == null || email.trim().isEmpty()) {
-                email = "No email set";
-            }
-            
-            // Update all text components with user data
-            jLabel2.setText(fullName);
-            jLabel3.setText(email);
-            // jTextField1.setText(fullName);
-            // jTextField2.setText(email);
-            
-            // Update window title with user name
-            setTitle("Admin Profile - " + fullName);
-            
-            // Debug output
-            System.out.println("Loading user data:");
-            System.out.println("First Name: " + firstName);
-            System.out.println("Last Name: " + lastName);
-            System.out.println("Full Name: " + fullName);
-            System.out.println("Email: " + email);
-        } else {
-            System.err.println("Current user is null in loadUserData()");
+            nameField.setText(currentUser.getUsername());
+            emailField.setText(currentUser.getEmail());
+            loadAvatar();
         }
     }
 
-    /**
-     * This method is called from within the constructor to initialize the form.
-     * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
-     */
-    @SuppressWarnings("unchecked")                    
-    private void initComponents() {
-
-        jPanel1 = new javax.swing.JPanel();
-        jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
-        jLabel1 = new javax.swing.JLabel();
-        jButton2 = new javax.swing.JButton();
-        jLabel4 = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
-        jLabel5 = new javax.swing.JLabel();
-        jTextField2 = new javax.swing.JTextField();
-
-        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
-
-        jLabel2.setText("");  
-        jLabel3.setText("");  
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel3)
-                    .addComponent(jLabel2))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(14, 14, 14)
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel3))
-        );
-
-        jButton1.setText("Change Password");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
-
-        // Set and resize the image
+    private void loadAvatar() {
         try {
-            String imagePath = System.getProperty("user.dir") + "/src/images/resources/admin_avatar.png";
-            ImageIcon originalIcon = new javax.swing.ImageIcon(imagePath);
-            if (originalIcon.getIconWidth() == -1) {
-                // Fallback image if admin_avatar.png is not found
-                originalIcon = new javax.swing.ImageIcon(getClass().getResource("/images/resources/default_avatar.png"));
-            }
-            Image image = originalIcon.getImage();
-            Image newimg = image.getScaledInstance(100, 100, java.awt.Image.SCALE_SMOOTH);
-            jLabel1.setIcon(new ImageIcon(newimg));
-        } catch (Exception e) {
-            System.err.println("Error loading profile image: " + e.getMessage());
-            // Set a colored circle as fallback
-            jLabel1.setPreferredSize(new Dimension(100, 100));
-            jLabel1.setOpaque(true);
-            jLabel1.setBackground(new Color(52, 152, 219));
-            jLabel1.setText(currentUser != null ? currentUser.getFirstName().substring(0, 1).toUpperCase() : "A");
-            jLabel1.setForeground(Color.WHITE);
-            jLabel1.setFont(new Font("Segoe UI", Font.BOLD, 36));
-            jLabel1.setHorizontalAlignment(SwingConstants.CENTER);
-        }
+            // Try to load user-specific avatar first
+            String avatarPath = "src/images/avatars/" + currentUser.getID() + ".png";
+            File avatarFile = new File(avatarPath);
 
-        jButton2.setText("Save Changes");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
-            }
-        });
-
-        jLabel4.setText("Name ");
-
-        jTextField1.setText("");  // Will be set in loadUserData
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
-            }
-        });
-
-        jLabel5.setText("Email");
-
-        jTextField2.setText("");  // Will be set in loadUserData
-        jTextField2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField2ActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(181, 181, 181)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton2)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 27, Short.MAX_VALUE)
-                        .addComponent(jButton1)
-                        .addGap(138, 138, 138))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel5)
-                            .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel4)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 144, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE))))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(10, 10, 10)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 92, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(24, 24, 24)
-                .addComponent(jLabel4)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(35, 35, 35)
-                .addComponent(jLabel5)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 77, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2))
-                .addContainerGap())
-        );
-
-        setPreferredSize(new Dimension(600, 500)); // choose width & height
-        setResizable(true); // optional: prevent resizing
-        pack();
-        setLocationRelativeTo(null); // center the window
-    }                   
-
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {                                            
-    }                                           
-
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {                                         
-        // Save Changes Button
-        String newName = jTextField1.getText().trim();
-        String newEmail = jTextField2.getText().trim();
-        
-        // Validate inputs
-        if (newName.isEmpty() || newEmail.isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                "Name and email cannot be empty",
-                "Validation Error",
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        if (!isValidEmail(newEmail)) {
-            JOptionPane.showMessageDialog(this,
-                "Please enter a valid email address",
-                "Validation Error",
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        try {
-            // Update the current user object
-            currentUser.setEmail(newEmail);
-            String[] nameParts = newName.split(" ", 2);
-            currentUser.setFirstName(nameParts[0]);
-            currentUser.setLastName(nameParts.length > 1 ? nameParts[1] : "");
-            
-            // Update in database
-            boolean success = userController.updateUserProfile(currentUser);
-            
-            if (success) {
-                JOptionPane.showMessageDialog(this,
-                    "Profile updated successfully!",
-                    "Success",
-                    JOptionPane.INFORMATION_MESSAGE);
-                loadUserData(); // Reload the displayed data
+            if (avatarFile.exists()) {
+                ImageIcon icon = new ImageIcon(avatarPath);
+                Image img = icon.getImage().getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+                avatarLabel.setIcon(new ImageIcon(img));
+                avatarLabel.setText("");
             } else {
-                JOptionPane.showMessageDialog(this,
-                    "Failed to update profile. Please try again.",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+                // Default avatar with initial
+                avatarLabel.setIcon(null);
+                avatarLabel.setText(currentUser.getUsername().substring(0, 1).toUpperCase());
+                avatarLabel.setFont(new Font("Segoe UI", Font.BOLD, 48));
+                avatarLabel.setForeground(new Color(52, 152, 219));
             }
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(this,
-                "Error updating profile: " + e.getMessage(),
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
+            // Fallback to initial
+            avatarLabel.setIcon(null);
+            avatarLabel.setText(currentUser.getUsername().substring(0, 1).toUpperCase());
+            avatarLabel.setFont(new Font("Segoe UI", Font.BOLD, 48));
+            avatarLabel.setForeground(new Color(52, 152, 219));
         }
-    }                                        
+    }
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {                                         
-        // Change Password Button
-        String currentPassword = JOptionPane.showInputDialog(this,
-            "Enter your current password:",
-            "Change Password",
-            JOptionPane.PLAIN_MESSAGE);
-            
-        if (currentPassword == null) return; // User cancelled
-        
-        // Verify current password
-        if (!userController.verifyPassword(currentUser.getUsername(), currentPassword)) {
-            JOptionPane.showMessageDialog(this,
-                "Current password is incorrect",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
+    private void saveChanges(ActionEvent e) {
+        String username = nameField.getText().trim();
+        String email = emailField.getText().trim();
+
+        if (username.isEmpty() || email.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Username and email cannot be empty", "Validation Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-        
-        // Get new password
-        JPasswordField newPass = new JPasswordField();
-        JPasswordField confirmPass = new JPasswordField();
-        Object[] message = {
-            "New Password:", newPass,
-            "Confirm Password:", confirmPass
-        };
-        
-        int option = JOptionPane.showConfirmDialog(this,
-            message,
-            "Change Password",
-            JOptionPane.OK_CANCEL_OPTION);
-            
-        if (option == JOptionPane.OK_OPTION) {
-            String newPassword = new String(newPass.getPassword());
-            String confirmPassword = new String(confirmPass.getPassword());
-            
-            if (!newPassword.equals(confirmPassword)) {
-                JOptionPane.showMessageDialog(this,
-                    "Passwords do not match",
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+
+        if (!isValidEmail(email)) {
+            JOptionPane.showMessageDialog(this, "Please enter a valid email address", "Validation Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+        try {
+            currentUser.setUsername(username);
+            currentUser.setEmail(email);
+
+            boolean success = userController.updateUserProfile(currentUser);
+
+            if (success) {
+                JOptionPane.showMessageDialog(this, "Profile updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to update profile", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error updating profile: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void changePassword(ActionEvent e) {
+        JDialog passwordDialog = new JDialog(this, "Change Password", true);
+        passwordDialog.setLayout(new GridBagLayout());
+        passwordDialog.setSize(400, 250);
+        passwordDialog.setLocationRelativeTo(this);
+
+        // Apply FlatLaf styling to dialog using UIUtil
+        UIUtil.styleDialog(passwordDialog);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+
+        JPasswordField currentPassField = new JPasswordField(20);
+        JPasswordField newPassField = new JPasswordField(20);
+        JPasswordField confirmPassField = new JPasswordField(20);
+
+        JButton changeBtn = new JButton("Change Password");
+        JButton cancelBtn = new JButton("Cancel");
+
+        // Style dialog buttons with UIUtil
+        UIUtil.styleButton(changeBtn, new Color(46, 204, 113));
+        UIUtil.styleButton(cancelBtn, new Color(149, 165, 166));
+
+        gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = GridBagConstraints.EAST;
+        passwordDialog.add(new JLabel("Current Password:"), gbc);
+        gbc.gridx = 1;
+        passwordDialog.add(currentPassField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 1;
+        passwordDialog.add(new JLabel("New Password:"), gbc);
+        gbc.gridx = 1;
+        passwordDialog.add(newPassField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 2;
+        passwordDialog.add(new JLabel("Confirm Password:"), gbc);
+        gbc.gridx = 1;
+        passwordDialog.add(confirmPassField, gbc);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout());
+        buttonPanel.add(changeBtn);
+        buttonPanel.add(cancelBtn);
+        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2;
+        passwordDialog.add(buttonPanel, gbc);
+
+        changeBtn.addActionListener(evt -> {
+            String currentPass = new String(currentPassField.getPassword());
+            String newPass = new String(newPassField.getPassword());
+            String confirmPass = new String(confirmPassField.getPassword());
+
+            if (currentPass.isEmpty() || newPass.isEmpty() || confirmPass.isEmpty()) {
+                JOptionPane.showMessageDialog(passwordDialog, "All fields are required", "Error", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            
+
+            if (!userController.verifyPassword(currentUser.getUsername(), currentPass)) {
+                JOptionPane.showMessageDialog(passwordDialog, "Current password is incorrect", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!newPass.equals(confirmPass)) {
+                JOptionPane.showMessageDialog(passwordDialog, "New passwords do not match", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
             try {
-                boolean success = userController.updatePassword(currentUser.getID(), newPassword);
+                boolean success = userController.updatePassword(currentUser.getID(), newPass);
                 if (success) {
-                    JOptionPane.showMessageDialog(this,
-                        "Password changed successfully!",
-                        "Success",
-                        JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(passwordDialog, "Password changed successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+                    passwordDialog.dispose();
                 } else {
-                    JOptionPane.showMessageDialog(this,
-                        "Failed to change password. Please try again.",
-                        "Error",
-                        JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(passwordDialog, "Failed to change password", "Error", JOptionPane.ERROR_MESSAGE);
                 }
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(this,
-                    "Error changing password: " + e.getMessage(),
-                    "Error",
-                    JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(passwordDialog, "Error changing password: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        cancelBtn.addActionListener(evt -> passwordDialog.dispose());
+
+        passwordDialog.setVisible(true);
+    }
+
+    private void changeAvatar(ActionEvent e) {
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Image files", "jpg", "jpeg", "png", "gif"));
+
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            try {
+                // Copy file to avatars directory
+                File avatarsDir = new File("src/images/avatars");
+                if (!avatarsDir.exists()) {
+                    avatarsDir.mkdirs();
+                }
+
+                File destFile = new File(avatarsDir, currentUser.getID() + ".png");
+                BufferedImage img = ImageIO.read(selectedFile);
+                ImageIO.write(img, "png", destFile);
+
+                loadAvatar();
+                JOptionPane.showMessageDialog(this, "Avatar updated successfully!", "Success", JOptionPane.INFORMATION_MESSAGE);
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error updating avatar: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
-    }                                        
+    }
 
-    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {                                            
-    }                                           
-    
     private boolean isValidEmail(String email) {
         return email.matches("^[A-Za-z0-9+_.-]+@(.+)$");
     }
-
-              
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
-    private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
-    private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField2;                  
 }

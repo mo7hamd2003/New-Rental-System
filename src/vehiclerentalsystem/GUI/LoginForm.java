@@ -291,21 +291,21 @@ public class LoginForm extends javax.swing.JFrame {
                 
                 switch (roleID) {
                     case 1: // Admin
-                        JOptionPane.showMessageDialog(this, 
+                        JOptionPane.showMessageDialog(this,
                             welcomeMessage,
-                            "Login Successful", 
+                            "Login Successful",
                             JOptionPane.INFORMATION_MESSAGE);
                         this.dispose();
                         new AdminDashboard(result.getUser()).setVisible(true);
                         break;
-                        
+
                     case 2: // Employee
-                        JOptionPane.showMessageDialog(this, 
+                        JOptionPane.showMessageDialog(this,
                             welcomeMessage,
-                            "Login Successful", 
+                            "Login Successful",
                             JOptionPane.INFORMATION_MESSAGE);
                         this.dispose();
-                        new EmployeeDashboard().setVisible(true);
+                        new EmployeeDashboard(result.getUser()).setVisible(true);
                         break;
                         
                     default:

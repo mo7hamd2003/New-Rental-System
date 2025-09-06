@@ -124,4 +124,10 @@ public class VehicleService {
                 .filter(v -> "available".equalsIgnoreCase(v.getStatus()))
                 .collect(java.util.stream.Collectors.toList());
     }
+
+    public List<Vehicle> getRentedVehicles() {
+        return getAllVehicles().stream()
+                .filter(v -> "rented".equalsIgnoreCase(v.getStatus()))
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

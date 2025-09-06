@@ -12,12 +12,13 @@ public class Vehicle {
     private int dailyRate;
     private String description;
     private String imagePath;
+    private int addedByUserId;
 
     public Vehicle() {
     }
 
     public Vehicle(int id, int companyId, String plateNb, String brand, String model, int year, String type,
-            String status, int dailyRate, String description, String imagePath) {
+            String status, int dailyRate, String description, String imagePath, int addedByUserId) {
         this.id = id;
         this.companyId = companyId;
         this.plateNb = plateNb;
@@ -29,7 +30,7 @@ public class Vehicle {
         this.dailyRate = dailyRate;
         this.description = description;
         this.imagePath = imagePath;
-
+        this.addedByUserId = addedByUserId;
     }
 
     public int getId() {
@@ -118,6 +119,14 @@ public class Vehicle {
 
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
+    }
+
+    public int getAddedByUserId() {
+        return addedByUserId;
+    }
+
+    public void setAddedByUserId(int addedByUserId) {
+        this.addedByUserId = addedByUserId;
     }
 
     @Override

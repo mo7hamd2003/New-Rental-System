@@ -13,8 +13,14 @@ public class ListCars extends JFrame {
     private DefaultTableModel tableModel;
     private Class<?> currentFrame;
     private JPanel headerPanel;
+    private vehiclerentalsystem.Models.User currentUser;
 
     public ListCars() {
+        this(null);
+    }
+
+    public ListCars(vehiclerentalsystem.Models.User currentUser) {
+        this.currentUser = currentUser;
         vehicleController = new VehicleController();
         initComponents();
         currentFrame = this.getClass();
@@ -141,7 +147,7 @@ public class ListCars extends JFrame {
         Vehicle selectedVehicle = vehicleController.getVehicleById(vehicleId);
         
         if (selectedVehicle != null) {
-            AddEditVehicleDialog dialog = new AddEditVehicleDialog(this, selectedVehicle, vehicleController);
+            AddEditVehicleDialog dialog = new AddEditVehicleDialog(this, selectedVehicle, vehicleController, currentUser);
             dialog.setVisible(true);
             // Refresh the table after editing
             loadVehicles();

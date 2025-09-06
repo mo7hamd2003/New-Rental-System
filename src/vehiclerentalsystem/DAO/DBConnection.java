@@ -7,7 +7,7 @@ import java.sql.SQLException;
 // DESKTOP-P19URNR
 // DESKTOP-QNGJD99
 public class DBConnection {
-    private static final String URL = "jdbc:sqlserver://DESKTOP-P19URNR\\\\SQLEXPRESS:1433;databaseName=Vehicle_Management_System;encrypt=true;trustServerCertificate=true";
+    private static final String URL = "jdbc:sqlserver://DESKTOP-QNGJD99\\\\SQLEXPRESS:1433;databaseName=Vehicle_Management_System;encrypt=true;trustServerCertificate=true";
     private static final String USERNAME = "sa";
     private static final String PASSWORD = "pass_123";
     

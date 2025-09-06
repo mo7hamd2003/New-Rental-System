@@ -221,16 +221,17 @@ public class UserDAO {
      * @return true if successful, false otherwise
      */
     public boolean AdminProfile(User user) {
-        String sql = "UPDATE Users SET FirstName = ?, LastName = ?, Email = ? WHERE id = ?";
-        
+        String sql = "UPDATE Users SET Username = ?, FirstName = ?, LastName = ?, Email = ? WHERE id = ?";
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            
-            pstmt.setString(1, user.getFirstName());
-            pstmt.setString(2, user.getLastName());
-            pstmt.setString(3, user.getEmail());
-            pstmt.setInt(4, user.getID());
-            
+
+            pstmt.setString(1, user.getUsername());
+            pstmt.setString(2, user.getFirstName());
+            pstmt.setString(3, user.getLastName());
+            pstmt.setString(4, user.getEmail());
+            pstmt.setInt(5, user.getID());
+
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {

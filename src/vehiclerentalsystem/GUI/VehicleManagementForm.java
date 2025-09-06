@@ -18,6 +18,7 @@ public class VehicleManagementForm extends javax.swing.JFrame {
 
     private Class<?> currentFrame;
     private VehicleController vehicleController;
+    private vehiclerentalsystem.Models.User currentUser;
     private JPanel cardsPanel;
     private JScrollPane cardsScrollPane;
     private JPanel headerPanel;
@@ -27,6 +28,11 @@ public class VehicleManagementForm extends javax.swing.JFrame {
     private List<Vehicle> allVehicles; // Store all vehicles for filtering
     
     public VehicleManagementForm() {
+        this(null);
+    }
+
+    public VehicleManagementForm(vehiclerentalsystem.Models.User currentUser) {
+        this.currentUser = currentUser;
         vehicleController = new VehicleController();
         initComponents();
         currentFrame = this.getClass();
@@ -429,9 +435,9 @@ public class VehicleManagementForm extends javax.swing.JFrame {
     }
     
     private void showAddVehicleDialog() {
-        AddEditVehicleDialog dialog = new AddEditVehicleDialog(this, null, vehicleController);
+        AddEditVehicleDialog dialog = new AddEditVehicleDialog(this, null, vehicleController, currentUser);
         dialog.setVisible(true);
-        
+
         // Refresh vehicles after dialog closes
         loadVehicles();
     }
@@ -473,7 +479,7 @@ public class VehicleManagementForm extends javax.swing.JFrame {
         if(confirm == JOptionPane.YES_OPTION) {
             try {
                 // edit the vehicle using controller
-                AddEditVehicleDialog dialog= new AddEditVehicleDialog(this, selectedCard.getVehicle(), vehicleController);
+                AddEditVehicleDialog dialog= new AddEditVehicleDialog(this, selectedCard.getVehicle(), vehicleController, currentUser);
                 dialog.setVisible(true);
                 loadVehicles();
             } catch (Exception e) {
@@ -544,13 +550,23 @@ public class VehicleManagementForm extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
         // DashBoard Button
-        if (currentFrame == AdminDashboard.class){
-            return;
+        if (currentUser != null && currentUser.isEmployee()) {
+            // Employee user - open EmployeeDashboard
+            if (currentFrame == EmployeeDashboard.class){
+                return;
+            }
+            this.dispose();
+            EmployeeDashboard dash = new EmployeeDashboard(currentUser);
+            dash.setVisible(true);
+        } else {
+            // Admin user - open AdminDashboard
+            if (currentFrame == AdminDashboard.class){
+                return;
+            }
+            this.dispose();
+            AdminDashboard dash = new AdminDashboard();
+            dash.setVisible(true);
         }
-        
-        this.dispose();
-        AdminDashboard dash = new AdminDashboard();
-        dash.setVisible(true);
     }
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {
@@ -558,9 +574,9 @@ public class VehicleManagementForm extends javax.swing.JFrame {
         if (currentFrame == VehicleManagementForm.class){
             return;
         }
-        
+
         this.dispose();
-        VehicleManagementForm car = new VehicleManagementForm();
+        VehicleManagementForm car = new VehicleManagementForm(currentUser);
         car.setVisible(true);
     }
 
@@ -568,7 +584,7 @@ public class VehicleManagementForm extends javax.swing.JFrame {
         if (currentFrame == EmployeeManagementForm.class){
             return;
         }
-        
+
         this.dispose();
         EmployeeManagementForm employee = new EmployeeManagementForm();
         employee.setVisible(true);

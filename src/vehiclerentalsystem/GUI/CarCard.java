@@ -217,6 +217,11 @@ public class CarCard extends JPanel {
     }
 
         private void showVehicleDetails() {
+        String addedByInfo = "";
+        if (vehicle.getAddedByUserId() > 0) {
+            addedByInfo = String.format("<p><strong>Added By:</strong> User ID %d</p>", vehicle.getAddedByUserId());
+        }
+
         String details = String.format(
             "<html><body style='width: 300px; padding: 10px;'>" +
             "<h2>%s %s</h2>" +
@@ -226,6 +231,7 @@ public class CarCard extends JPanel {
             "<p><strong>Status:</strong> %s</p>" +
             "<p><strong>Daily Rate:</strong> $%s</p>" +
             "<p><strong>Company ID:</strong> %s</p>" +
+            "%s" +
             "<p><strong>Description:</strong><br>%s</p>" +
             "</body></html>",
             vehicle.getBrand(), vehicle.getModel(),
@@ -235,6 +241,7 @@ public class CarCard extends JPanel {
             vehicle.getStatus(),
             vehicle.getDailyRate(),
             vehicle.getCompanyId(),
+            addedByInfo,
             vehicle.getDescription() != null ? vehicle.getDescription() : "No description available"
         );
         

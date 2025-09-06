@@ -2,6 +2,7 @@ package vehiclerentalsystem.GUI;
 
 import vehiclerentalsystem.Controllers.VehicleController;
 import vehiclerentalsystem.Models.Vehicle;
+import vehiclerentalsystem.Models.User;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
@@ -12,6 +13,7 @@ import java.io.File;
 public class AddEditVehicleDialog extends JDialog {
     private VehicleController vehicleController;
     private Vehicle vehicleToEdit;
+    private User currentUser;
     private boolean isEditMode;
     
     // Form components
@@ -31,11 +33,12 @@ public class AddEditVehicleDialog extends JDialog {
     
     private String selectedImagePath;
     
-    public AddEditVehicleDialog(JFrame parent, Vehicle vehicle, VehicleController controller) {
+    public AddEditVehicleDialog(JFrame parent, Vehicle vehicle, VehicleController controller, User currentUser) {
         super(parent, vehicle == null ? "Add New Vehicle" : "Edit Vehicle", true);
-        
+
         this.vehicleController = controller;
         this.vehicleToEdit = vehicle;
+        this.currentUser = currentUser;
         this.isEditMode = vehicle != null;
         
         initializeComponents();
@@ -326,6 +329,11 @@ public class AddEditVehicleDialog extends JDialog {
         vehicle.setStatus((String) statusComboBox.getSelectedItem());
         vehicle.setDailyRate(Integer.parseInt(dailyRateField.getText().trim()));
         vehicle.setDescription(descriptionArea.getText().trim());
+
+        // Set the user who added this vehicle
+        if (currentUser != null) {
+            vehicle.setAddedByUserId(currentUser.getID());
+        }
         
         // Handle image
         if (selectedImagePath != null && !selectedImagePath.isEmpty()) {

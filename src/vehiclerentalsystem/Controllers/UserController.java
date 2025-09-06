@@ -39,4 +39,8 @@ public class UserController {
         return userDAO.updatePassword(userId, newPassword);
     }
 
+    public List<User> getAllUsers() {
+        return userDAO.getAllUsers();
+    }
+
 }

@@ -53,4 +53,8 @@ public class VehicleController {
     public List<Vehicle> getAvailableVCehicles() {
         return vehicleService.getAvailableVehicles();
     }
+
+    public List<Vehicle> getRentedVehicles() {
+        return vehicleService.getRentedVehicles();
+    }
 }
