@@ -172,7 +172,7 @@ public class AdminDashboard extends javax.swing.JFrame {
 		jButton4.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
 		jButton4.setForeground(new java.awt.Color(255, 255, 255));
 		jButton4.setIcon(new javax.swing.ImageIcon("C:\\Users\\mhd\\Downloads\\settings (1).png")); // NOI18N
-		jButton4.setText(" Settings");
+		jButton4.setText(" Payment");
 		jButton4.setBorderPainted(false);
 		jButton4.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
 		jButton4.addActionListener(new java.awt.event.ActionListener() {
@@ -362,7 +362,7 @@ public class AdminDashboard extends javax.swing.JFrame {
 		jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 18));
 		jLabel9.setText("35");
 
-		jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 14)); 
+		jLabel10.setFont(new java.awt.Font("Segoe UI", 1, 14));
 		jLabel10.setText("Total Cars Avaliable");
 
 		javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
@@ -895,7 +895,8 @@ public class AdminDashboard extends javax.swing.JFrame {
 								.addContainerGap()));
 		layout.setVerticalGroup(
 				layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-						.addComponent(sidebarPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
+						.addComponent(sidebarPanel, javax.swing.GroupLayout.PREFERRED_SIZE,
+								javax.swing.GroupLayout.DEFAULT_SIZE,
 								javax.swing.GroupLayout.PREFERRED_SIZE)
 						.addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE,
 								Short.MAX_VALUE));
@@ -965,7 +966,14 @@ public class AdminDashboard extends javax.swing.JFrame {
 	}
 
 	private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {
+		// Payment management button
+		if (currentFrame == PaymentForm.class) {
+			return;
+		}
 
+		this.dispose();
+		PaymentForm payment = new PaymentForm();
+		payment.setVisible(true);
 	}
 
 	private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {
@@ -1029,98 +1037,100 @@ public class AdminDashboard extends javax.swing.JFrame {
 	}
 
 	private void updateAvailableVehiclesCount() {
-	    int availableVehicles = vehicleController.loadAllVehicles().size();
-	    jLabel9.setText(String.valueOf(availableVehicles));
+		int availableVehicles = vehicleController.loadAllVehicles().size();
+		jLabel9.setText(String.valueOf(availableVehicles));
 	}
 
 	private void updateRentedCarsCount() {
-	    int rentedCars = vehicleController.getRentedVehicles().size();
-	    jLabel12.setText(String.valueOf(rentedCars));
+		int rentedCars = vehicleController.getRentedVehicles().size();
+		jLabel12.setText(String.valueOf(rentedCars));
 	}
 
 	private void updateCustomersCount() {
-	    int customers = customerController.getAllCustomers().size();
-	    jLabel15.setText(String.valueOf(customers));
+		int customers = customerController.getAllCustomers().size();
+		jLabel15.setText(String.valueOf(customers));
 	}
 
 	private void setupBookingTable() {
-	    String[] columnNames = {"Customer Name", "Car Model", "Employee Name", "Start Date", "End Date", "Status"};
-	    bookingTableModel = new DefaultTableModel(columnNames, 0) {
-	        @Override
-	        public boolean isCellEditable(int row, int column) {
-	            return false; // Make table read-only
-	        }
-	    };
+		String[] columnNames = { "Customer Name", "Car Model", "Employee Name", "Start Date", "End Date", "Status" };
+		bookingTableModel = new DefaultTableModel(columnNames, 0) {
+			@Override
+			public boolean isCellEditable(int row, int column) {
+				return false; // Make table read-only
+			}
+		};
 
-	    bookingTable = new JTable(bookingTableModel);
-	    bookingTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-	    bookingTable.getTableHeader().setReorderingAllowed(false);
-	    bookingTable.setRowHeight(25);
-	    bookingTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		bookingTable = new JTable(bookingTableModel);
+		bookingTable.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+		bookingTable.getTableHeader().setReorderingAllowed(false);
+		bookingTable.setRowHeight(25);
+		bookingTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 	}
 
 	private void loadBookingData() {
-	    // Clear existing data
-	    bookingTableModel.setRowCount(0);
+		// Clear existing data
+		bookingTableModel.setRowCount(0);
 
-	    // Get all bookings
-	    List<Booking> bookings = bookingController.getAllBookings();
+		// Get all bookings
+		List<Booking> bookings = bookingController.getAllBookings();
 
-	    for (Booking booking : bookings) {
-	        // Get customer name
-	        Customer customer = getCustomerById(booking.getCustomerId());
-	        String customerName = customer != null ? customer.getFirstname() + " " + customer.getLastname() : "Unknown";
+		for (Booking booking : bookings) {
+			// Get customer name
+			Customer customer = getCustomerById(booking.getCustomerId());
+			String customerName = customer != null ? customer.getFirstname() + " " + customer.getLastname() : "Unknown";
 
-	        // Get vehicle model
-	        Vehicle vehicle = vehicleController.getVehicleById(booking.getVehicleId());
-	        String vehicleModel = vehicle != null ? vehicle.getBrand() + " " + vehicle.getModel() : "Unknown";
+			// Get vehicle model
+			Vehicle vehicle = vehicleController.getVehicleById(booking.getVehicleId());
+			String vehicleModel = vehicle != null ? vehicle.getBrand() + " " + vehicle.getModel() : "Unknown";
 
-	        // Get employee name
-	        User employee = getUserById(booking.getUserId());
-	        String employeeName = employee != null ? employee.getFirstName() + " " + employee.getLastName() : "Unknown";
+			// Get employee name
+			User employee = getUserById(booking.getUserId());
+			String employeeName = employee != null ? employee.getFirstName() + " " + employee.getLastName() : "Unknown";
 
-	        // Format dates
-	        String startDate = booking.getStartDate() != null ? booking.getStartDate().toString() : "N/A";
-	        String endDate = booking.getEndDate() != null ? booking.getEndDate().toString() : "N/A";
+			// Format dates
+			String startDate = booking.getStartDate() != null ? booking.getStartDate().toString() : "N/A";
+			String endDate = booking.getEndDate() != null ? booking.getEndDate().toString() : "N/A";
 
-	        // Determine status
-	        String status = "Active";
-	        if (booking.getReturnDate() != null) {
-	            status = "Completed";
-	        }
+			// Determine status
+			String status = "Active";
+			if (booking.getReturnDate() != null) {
+				status = "Completed";
+			}
 
-	        Object[] row = {
-	            customerName,
-	            vehicleModel,
-	            employeeName,
-	            startDate,
-	            endDate,
-	            status
-	        };
-	        bookingTableModel.addRow(row);
-	    }
+			Object[] row = {
+					customerName,
+					vehicleModel,
+					employeeName,
+					startDate,
+					endDate,
+					status
+			};
+			bookingTableModel.addRow(row);
+		}
 	}
 
 	private Customer getCustomerById(int customerId) {
-	    // This is a simple implementation - in a real app you'd have a more efficient lookup
-	    List<Customer> customers = customerController.getAllCustomers();
-	    for (Customer customer : customers) {
-	        if (customer.getId() == customerId) {
-	            return customer;
-	        }
-	    }
-	    return null;
+		// This is a simple implementation - in a real app you'd have a more efficient
+		// lookup
+		List<Customer> customers = customerController.getAllCustomers();
+		for (Customer customer : customers) {
+			if (customer.getId() == customerId) {
+				return customer;
+			}
+		}
+		return null;
 	}
 
 	private User getUserById(int userId) {
-	    // This is a simple implementation - in a real app you'd have a more efficient lookup
-	    List<User> users = userController.getAllUsers();
-	    for (User user : users) {
-	        if (user.getID() == userId) {
-	            return user;
-	        }
-	    }
-	    return null;
+		// This is a simple implementation - in a real app you'd have a more efficient
+		// lookup
+		List<User> users = userController.getAllUsers();
+		for (User user : users) {
+			if (user.getID() == userId) {
+				return user;
+			}
+		}
+		return null;
 	}
 
 	/**

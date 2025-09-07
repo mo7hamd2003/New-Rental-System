@@ -94,7 +94,7 @@ public class BookingManagementForm extends JFrame {
         // ===== Form panel =====
         JPanel formPanel = new JPanel(new GridLayout(9, 2, 5, 5));
 
-        formPanel.add(new JLabel("Vehicle ID:"));
+        formPanel.add(new JLabel("Vehicle:"));
         // txtVehicleId = new JTextField();
         // formPanel.add(txtVehicleId);
         cmbVehicle = new JComboBox<>();
@@ -108,7 +108,7 @@ public class BookingManagementForm extends JFrame {
         formPanel.add(cmbCustomer);
         loadCustomers(); // Load the combo box items
 
-        formPanel.add(new JLabel("User ID:"));
+        formPanel.add(new JLabel("User:"));
         // txtUserId = new JTextField();
         // formPanel.add(txtUserId);
         cmbUser = new JComboBox<>();
